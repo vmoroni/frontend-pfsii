@@ -37,65 +37,67 @@ const AppRoutes = () => {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route exact path="/login" element={<LoginPage />} />
-          <Route
-            exact
-            path="/"
-            element={
-              <Private>
-                <HomePage />
-              </Private>
-            }
-          />
-          <Route path="/cadastro">
+          <Route exact path="/frontend-pfsii">
+            <Route exact path="/login" element={<LoginPage />} />
             <Route
-              path="alunos"
+              exact
+              path="/"
               element={
                 <Private>
-                  <PageAlunos />
+                  <HomePage />
                 </Private>
               }
             />
-            <Route
-              path="cargos"
-              element={
-                <Private>
-                  <PageCargos />
-                </Private>
-              }
-            />
-            <Route
-              path="cursos"
-              element={
-                <Private>
-                  <PageCursos />
-                </Private>
-              }
-            />
-            <Route
-              path="empresas"
-              element={
-                <Private>
-                  <PageEmpresas />
-                </Private>
-              }
-            />
-            <Route
-              path="funcionarios"
-              element={
-                <Private>
-                  <PageFuncionarios />
-                </Private>
-              }
-            />
-            <Route
-              path="turmas"
-              element={
-                <Private>
-                  <PageTurmas />
-                </Private>
-              }
-            />
+            <Route path="/cadastro">
+              <Route
+                path="alunos"
+                element={
+                  <Private>
+                    <PageAlunos />
+                  </Private>
+                }
+              />
+              <Route
+                path="cargos"
+                element={
+                  <Private>
+                    <PageCargos />
+                  </Private>
+                }
+              />
+              <Route
+                path="cursos"
+                element={
+                  <Private>
+                    <PageCursos />
+                  </Private>
+                }
+              />
+              <Route
+                path="empresas"
+                element={
+                  <Private>
+                    <PageEmpresas />
+                  </Private>
+                }
+              />
+              <Route
+                path="funcionarios"
+                element={
+                  <Private>
+                    <PageFuncionarios />
+                  </Private>
+                }
+              />
+              <Route
+                path="turmas"
+                element={
+                  <Private>
+                    <PageTurmas />
+                  </Private>
+                }
+              />
+            </Route>
           </Route>
         </Routes>
       </AuthProvider>
