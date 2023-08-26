@@ -7,7 +7,6 @@ import { Button } from "react-bootstrap";
 
 export default function Cabecalho1(props) {
   const { logout, user } = useContext(AuthContext);
-  console.log(user);
 
   const handleLogout = () => {
     logout();

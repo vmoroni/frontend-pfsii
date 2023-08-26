@@ -28,7 +28,7 @@ const AppRoutes = () => {
       return <div className="loading">Carregando...</div>;
     }
 
-    if (!authenticated) return <Navigate to="/login" />;
+    if (!authenticated) return <Navigate to="/frontend-pfsii/login" />;
 
     return children;
   };
@@ -38,19 +38,19 @@ const AppRoutes = () => {
       <AuthProvider>
         <Routes>
           <Route exact path="/frontend-pfsii">
-            <Route exact path="/login" element={<LoginPage />} />
+            <Route exact path="/frontend-pfsii/login" element={<LoginPage />} />
             <Route
               exact
-              path="/"
+              path="/frontend-pfsii"
               element={
                 <Private>
                   <HomePage />
                 </Private>
               }
             />
-            <Route path="/cadastro">
+            <Route path="/frontend-pfsii/cadastro">
               <Route
-                path="alunos"
+                path="/frontend-pfsii/cadastro/alunos"
                 element={
                   <Private>
                     <PageAlunos />
@@ -58,7 +58,7 @@ const AppRoutes = () => {
                 }
               />
               <Route
-                path="cargos"
+                path="/frontend-pfsii/cadastro/cargos"
                 element={
                   <Private>
                     <PageCargos />
@@ -66,7 +66,7 @@ const AppRoutes = () => {
                 }
               />
               <Route
-                path="cursos"
+                path="/frontend-pfsii/cadastro/cursos"
                 element={
                   <Private>
                     <PageCursos />
@@ -74,7 +74,7 @@ const AppRoutes = () => {
                 }
               />
               <Route
-                path="empresas"
+                path="/frontend-pfsii/cadastro/empresas"
                 element={
                   <Private>
                     <PageEmpresas />
@@ -82,7 +82,7 @@ const AppRoutes = () => {
                 }
               />
               <Route
-                path="funcionarios"
+                path="/frontend-pfsii/cadastro/funcionarios"
                 element={
                   <Private>
                     <PageFuncionarios />
@@ -90,7 +90,7 @@ const AppRoutes = () => {
                 }
               />
               <Route
-                path="turmas"
+                path="/frontend-pfsii/cadastro/turmas"
                 element={
                   <Private>
                     <PageTurmas />

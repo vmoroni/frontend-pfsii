@@ -20,8 +20,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (email, password) => {
-    console.log("login auth", { email, password });
-
     // api criar uma session
 
     const loggedUser = {
@@ -33,17 +31,15 @@ export const AuthProvider = ({ children }) => {
 
     if (password === "admin") {
       setUser({ id: "123", email });
-      navigate("/");
+      navigate("/frontend-pfsii");
     } else {
-      
     }
   };
 
   const logout = () => {
-    console.log("logout");
     localStorage.removeItem("user");
     setUser(null);
-    navigate("/login");
+    navigate("/frontend-pfsii/login");
   };
 
   return (

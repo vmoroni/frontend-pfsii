@@ -27,26 +27,26 @@ export default function Menu() {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="justify-content-end flex-grow-1 pe-3">
-                <Nav.Link as={Link} to="/">
+                <Nav.Link as={Link} to="/frontend-pfsii">
                   Home
                 </Nav.Link>
                 <NavDropdown title="Cadastro" id={`offcanvasNavbarDropdown`}>
-                  <NavDropdown.Item as={Link} to="/cadastro/alunos">
+                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/alunos">
                     Alunos
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/cadastro/cargos">
+                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/cargos">
                     Cargos
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/cadastro/cursos">
+                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/cursos">
                     Cursos
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/cadastro/empresas">
+                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/empresas">
                     Empresas
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/cadastro/funcionarios">
+                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/funcionarios">
                     Funcionarios
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/cadastro/turmas">
+                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/turmas">
                     Turmas
                   </NavDropdown.Item>
                 </NavDropdown>
