@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/frontend-pfsii/static/css/main.71f8cfab.css",
-    "main.js": "/frontend-pfsii/static/js/main.9445664c.js",
+    "main.js": "/frontend-pfsii/static/js/main.f91d1359.js",
     "static/media/logo_1.png": "/frontend-pfsii/static/media/logo_1.08a52f31a14d901fab59.png",
     "static/media/lato-latin-300.woff": "/frontend-pfsii/static/media/lato-latin-300.4d96f9e685a54d1ef6cf.woff",
     "static/media/lato-latin-700italic.woff": "/frontend-pfsii/static/media/lato-latin-700italic.be7f3d32a138ba64b9d0.woff",
@@ -25,10 +25,10 @@
     "static/media/lato-latin-100italic.woff2": "/frontend-pfsii/static/media/lato-latin-100italic.89b95baaf00652c7c3af.woff2",
     "index.html": "/frontend-pfsii/index.html",
     "main.71f8cfab.css.map": "/frontend-pfsii/static/css/main.71f8cfab.css.map",
-    "main.9445664c.js.map": "/frontend-pfsii/static/js/main.9445664c.js.map"
+    "main.f91d1359.js.map": "/frontend-pfsii/static/js/main.f91d1359.js.map"
   },
   "entrypoints": [
     "static/css/main.71f8cfab.css",
-    "static/js/main.9445664c.js"
+    "static/js/main.f91d1359.js"
   ]
 }
