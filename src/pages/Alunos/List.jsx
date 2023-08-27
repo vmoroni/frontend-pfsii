@@ -59,7 +59,7 @@ export default function TabelaCadastroAlunos({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Alunos"} />
-      <Container className="mt-3">
+      <Container className="mt-3 overflow-auto">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
@@ -76,11 +76,11 @@ export default function TabelaCadastroAlunos({
           <thead>
             <tr>
               <th>#</th>
-              <th>CPF</th>
               <th>Nome</th>
-              <th>RG</th>
-              <th>Telefone</th>
-              <th>Escola</th>
+              <th>CPF</th>
+              {/* <th>RG</th> */}
+              {/* <th>Telefone</th> */}
+              {/* <th>Escola</th> */}
               <th>Serie</th>
               <th>Periodo</th>
               <th>Ações</th>
@@ -97,14 +97,14 @@ function LinhaAluno({ aluno, handleEdit, handleConfirm }) {
   return (
     <tr>
       <td>{aluno.codigo}</td>
-      <td>{aluno.cpf}</td>
       <td>{aluno.nome}</td>
-      <td>{aluno.rg}</td>
-      <td>{aluno.telefone}</td>
-      <td>{aluno.escola}</td>
+      <td>{aluno.cpf}</td>
+      {/* <td>{aluno.rg}</td> */}
+      {/* <td>{aluno.telefone}</td> */}
+      {/* <td>{aluno.escola}</td> */}
       <td>{aluno.serie}</td>
       <td>{aluno.periodo}</td>
-      <td className="d-flex justify-content-around">
+      <td>
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(aluno)}

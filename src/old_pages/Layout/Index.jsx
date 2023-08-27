@@ -5,7 +5,8 @@ import Funcionarios from "../Funcionarios/Index";
 import Alunos from "../Alunos/Index";
 import Turmas from "../Turmas/Index";
 import Cabecalho1 from "../../components/Cabecalho1";
-import Home from "../HomePage/Index";
+
+
 
 // PÁGINAS
 
@@ -69,7 +70,6 @@ function HomePage(props) {
   return (
     <>
       <Cabecalho1 />
-      <Home />
     </>
   );
 }

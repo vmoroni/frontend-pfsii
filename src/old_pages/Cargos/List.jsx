@@ -1,4 +1,4 @@
-import { Table, Form } from "react-bootstrap";
+import { Table, Form, Row, Col } from "react-bootstrap";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { BotaoNovo } from "../../components/Botoes";
 import Cabecalho2 from "../../components/Cabecalho2";
@@ -7,9 +7,9 @@ import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function TabelaCadastroEmpresas({
-  empresas,
-  setEmpresas,
+export default function TabelaCadastroCargos({
+  cargos,
+  setCargos,
   filtro,
   aoMudarFiltro,
   setOnEdit,
@@ -25,13 +25,11 @@ export default function TabelaCadastroEmpresas({
 
   const handleDelete = async (codigo) => {
     await axios
-      .delete(`${urlBase}/empresas/${codigo}`)
+      .delete(`${urlBase}/cargos/${codigo}`)
       .then(({ data }) => {
-        const newArray = empresas.filter(
-          (empresa) => empresa.codigo !== codigo
-        );
+        const newArray = cargos.filter((cargo) => cargo.codigo !== codigo);
 
-        setEmpresas(newArray);
+        setCargos(newArray);
         toast.info(data.mensagem);
       })
       .catch(({ response }) => toast.error(response.data.mensagem));
@@ -44,15 +42,13 @@ export default function TabelaCadastroEmpresas({
     setExibeTabela(false);
   };
 
-  empresas.forEach((empresa, i) => {
-    if (
-      empresa.razao_social.toLowerCase().indexOf(filtro.toLowerCase()) === -1
-    ) {
+  cargos.forEach((cargo, i) => {
+    if (cargo.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
       return;
     }
     linhas.push(
-      <LinhaEmpresa
-        empresa={empresa}
+      <LinhaCargo
+        cargo={cargo}
         key={i}
         handleEdit={handleEdit}
         handleConfirm={confirmOnDelete}
@@ -62,30 +58,31 @@ export default function TabelaCadastroEmpresas({
 
   return (
     <div>
-      <Cabecalho2 texto1={"Consulta"} texto2={"Empresas"} />
-      <Container className="mt-3 overflow-auto">
+      <Cabecalho2 texto1={"Consulta"} texto2={"Cargos"} />
+      <Container className="mt-3">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
-            <Form.Control
-              type="text"
-              value={filtro}
-              placeholder="Pesquisar por razão social..."
-              onChange={(e) => aoMudarFiltro(e.target.value)}
-              style={{ width: "300px" }}
-            />
+            <Row>
+              <Col>
+                {" "}
+                <Form.Control
+                  type="text"
+                  value={filtro}
+                  placeholder="Pesquisar por nome..."
+                  onChange={(e) => aoMudarFiltro(e.target.value)}
+                  style={{ width: "300px" }}
+                />
+              </Col>
+            </Row>
           </Form>
         </div>
         <Table hover style={{ fontSize: "14px" }}>
           <thead>
             <tr>
               <th>#</th>
-              <th>Razão Social</th>
-              {/* <th>CNPJ</th> */}
-              <th>IE</th>
-              <th>Telefone</th>
-              {/* <th>E-mail</th> */}
-              <th>Proprietário</th>
+              <th>Nome</th>
+              <th>Descrição</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -96,26 +93,22 @@ export default function TabelaCadastroEmpresas({
   );
 }
 
-function LinhaEmpresa({ empresa, handleEdit, handleConfirm }) {
+function LinhaCargo({ cargo, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td>{empresa.codigo}</td>
-      <td>{empresa.razao_social}</td>
-      {/* <td>{empresa.cnpj}</td> */}
-      <td>{empresa.ie}</td>
-      <td>{empresa.telefone}</td>
-      {/* <td>{empresa.email}</td> */}
-      <td>{empresa.proprietario}</td>
-      <td>
+      <td>{cargo.codigo}</td>
+      <td>{cargo.nome}</td>
+      <td>{cargo.descricao}</td>
+      <td className="d-flex justify-content-around">
         <AiOutlineEdit
           size={20}
-          onClick={() => handleEdit(empresa)}
-          style={{ cursor: "pointer" }}
+          onClick={() => handleEdit(cargo)}
+          style={{ cursor: "pointer",  }}
           title="Editar"
         />{" "}
-        <AiOutlineDelete
+        <AiOutlineDelete 
           size={20}
-          onClick={() => handleConfirm(empresa.codigo)}
+          onClick={() => handleConfirm(cargo.codigo)}
           style={{ cursor: "pointer", color: "red" }}
           title="Excluir"
         />

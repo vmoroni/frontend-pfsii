@@ -59,7 +59,7 @@ export default function TabelaCadastroTurmas({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Turmas"} />
-      <Container className="mt-3">
+      <Container className="mt-3 overflow-auto">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
@@ -80,9 +80,9 @@ export default function TabelaCadastroTurmas({
               <th>Ano Letivo</th>
               <th>Cursos</th>
               <th>Professor</th>
-              <th>Início</th>
+              {/* <th>Início</th>
               <th>Status</th>
-              <th>Vagas</th>
+              <th>Vagas</th> */}
               <th>Ações</th>
             </tr>
           </thead>
@@ -101,10 +101,10 @@ function LinhaTurma({ turma, handleEdit, handleConfirm }) {
       <td>{turma.ano_letivo}</td>
       <td>{turma.curso_nome}</td>
       <td>{turma.funcionario_nome}</td>
-      <td>{turma.dt_inicio}</td>
+      {/* <td>{turma.dt_inicio}</td>
       <td>{turma.status}</td>
-      <td>{turma.vagas}</td>
-      <td className="d-flex justify-content-around">
+      <td>{turma.vagas}</td> */}
+      <td>
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(turma)}

@@ -1,45 +1,55 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Form from "./Form";
 import List from "./List";
-import { urlBase } from "../../utils/definicoes.js";
+import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function TelaCadastroFuncionarios(props) {
+export default function TelaCadastroTurmas(props) {
   const [exibeTabela, setExibeTabela] = useState(true);
   const [onEdit, setOnEdit] = useState(null);
+  const [turmas, setTurmas] = useState([]);
+  const [cursos, setCursos] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
-  const [cargos, setCargos] = useState([]);
   const [filtro, setFiltro] = useState("");
+
+  const getTurmas = async () => {
+    try {
+      const res = await axios.get(urlBase + "/turmas");
+      setTurmas(res.data.sort((a, b) => (a.codigo > b.codigo ? 1 : -1)));
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   const getFuncionarios = async () => {
     try {
-      const res = await axios.get(urlBase + "/funcionarios");
+      const res = await axios.get(urlBase + "/funcionarios/professor");
       setFuncionarios(res.data);
     } catch (error) {
       toast.error(error);
     }
   };
 
-  const getCargos = async () => {
+  const getCursos = async () => {
     try {
-      const res = await axios.get(urlBase + "/cargos");
-      setCargos(res.data);
+      const res = await axios.get(urlBase + "/cursos");
+      setCursos(res.data);
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
     }
   };
 
   useEffect(() => {
+    getTurmas();
     getFuncionarios();
-    getCargos();
-  }, [setFuncionarios]);
+    getCursos();
+  }, [setTurmas]);
 
   return exibeTabela ? (
     <List
-      funcionarios={funcionarios}
-      setFuncionarios={setFuncionarios}
+      turmas={turmas}
+      setTurmas={setTurmas}
       setOnEdit={setOnEdit}
       filtro={filtro}
       aoMudarFiltro={setFiltro}
@@ -47,10 +57,11 @@ export default function TelaCadastroFuncionarios(props) {
     />
   ) : (
     <Form
-      cargos={cargos}
+      cursos={cursos}
+      funcionarios={funcionarios}
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getFuncionarios={getFuncionarios}
+      getTurmas={getTurmas}
       setExibeTabela={setExibeTabela}
     />
   );

@@ -61,7 +61,7 @@ export default function TabelaCadastroFuncionarios({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Funcionarios"} />
-      <Container className="mt-3">
+      <Container className="mt-3 overflow-auto">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
@@ -78,13 +78,13 @@ export default function TabelaCadastroFuncionarios({
           <thead>
             <tr>
               <th>#</th>
-              <th>CPF</th>
               <th>Nome</th>
-              <th>Usuário</th>
+              <th>CPF</th>
+              {/* <th>Usuário</th> */}
               <th>Cargo</th>
-              <th>Telefone</th>
+              {/* <th>Telefone</th> */}
               <th>Status</th>
-              <th>E-mail</th>
+              {/* <th>E-mail</th> */}
               <th>Ações</th>
             </tr>
           </thead>
@@ -99,14 +99,14 @@ function LinhaFuncionario({ funcionario, handleEdit, handleConfirm }) {
   return (
     <tr>
       <td>{funcionario.codigo}</td>
-      <td>{funcionario.cpf}</td>
       <td>{funcionario.nome}</td>
-      <td>{funcionario.nome_usuario}</td>
+      <td>{funcionario.cpf}</td>
+      {/* <td>{funcionario.nome_usuario}</td> */}
       <td>{funcionario.cargo_nome}</td>
-      <td>{funcionario.telefone}</td>
+      {/* <td>{funcionario.telefone}</td> */}
       <td>{funcionario.status}</td>
-      <td>{funcionario.email}</td>
-      <td className="d-flex justify-content-around">
+      {/* <td>{funcionario.email}</td> */}
+      <td>
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(funcionario)}

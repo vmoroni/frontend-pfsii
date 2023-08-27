@@ -7,9 +7,9 @@ import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function TabelaCadastroEmpresas({
-  empresas,
-  setEmpresas,
+export default function TabelaCadastroTurmas({
+  turmas,
+  setTurmas,
   filtro,
   aoMudarFiltro,
   setOnEdit,
@@ -25,13 +25,11 @@ export default function TabelaCadastroEmpresas({
 
   const handleDelete = async (codigo) => {
     await axios
-      .delete(`${urlBase}/empresas/${codigo}`)
+      .delete(`${urlBase}/turmas/${codigo}`)
       .then(({ data }) => {
-        const newArray = empresas.filter(
-          (empresa) => empresa.codigo !== codigo
-        );
+        const newArray = turmas.filter((turma) => turma.codigo !== codigo);
 
-        setEmpresas(newArray);
+        setTurmas(newArray);
         toast.info(data.mensagem);
       })
       .catch(({ response }) => toast.error(response.data.mensagem));
@@ -44,15 +42,13 @@ export default function TabelaCadastroEmpresas({
     setExibeTabela(false);
   };
 
-  empresas.forEach((empresa, i) => {
-    if (
-      empresa.razao_social.toLowerCase().indexOf(filtro.toLowerCase()) === -1
-    ) {
+  turmas.forEach((turma, i) => {
+    if (turma.ano_letivo.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
       return;
     }
     linhas.push(
-      <LinhaEmpresa
-        empresa={empresa}
+      <LinhaTurma
+        turma={turma}
         key={i}
         handleEdit={handleEdit}
         handleConfirm={confirmOnDelete}
@@ -62,15 +58,15 @@ export default function TabelaCadastroEmpresas({
 
   return (
     <div>
-      <Cabecalho2 texto1={"Consulta"} texto2={"Empresas"} />
-      <Container className="mt-3 overflow-auto">
+      <Cabecalho2 texto1={"Consulta"} texto2={"Turmas"} />
+      <Container className="mt-3">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
             <Form.Control
               type="text"
               value={filtro}
-              placeholder="Pesquisar por razão social..."
+              placeholder="Ano letivo..."
               onChange={(e) => aoMudarFiltro(e.target.value)}
               style={{ width: "300px" }}
             />
@@ -80,12 +76,13 @@ export default function TabelaCadastroEmpresas({
           <thead>
             <tr>
               <th>#</th>
-              <th>Razão Social</th>
-              {/* <th>CNPJ</th> */}
-              <th>IE</th>
-              <th>Telefone</th>
-              {/* <th>E-mail</th> */}
-              <th>Proprietário</th>
+              <th>Período</th>
+              <th>Ano Letivo</th>
+              <th>Cursos</th>
+              <th>Professor</th>
+              <th>Início</th>
+              <th>Status</th>
+              <th>Vagas</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -96,26 +93,27 @@ export default function TabelaCadastroEmpresas({
   );
 }
 
-function LinhaEmpresa({ empresa, handleEdit, handleConfirm }) {
+function LinhaTurma({ turma, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td>{empresa.codigo}</td>
-      <td>{empresa.razao_social}</td>
-      {/* <td>{empresa.cnpj}</td> */}
-      <td>{empresa.ie}</td>
-      <td>{empresa.telefone}</td>
-      {/* <td>{empresa.email}</td> */}
-      <td>{empresa.proprietario}</td>
-      <td>
+      <td>{turma.codigo}</td>
+      <td>{turma.periodo}</td>
+      <td>{turma.ano_letivo}</td>
+      <td>{turma.curso_nome}</td>
+      <td>{turma.funcionario_nome}</td>
+      <td>{turma.dt_inicio}</td>
+      <td>{turma.status}</td>
+      <td>{turma.vagas}</td>
+      <td className="d-flex justify-content-around">
         <AiOutlineEdit
           size={20}
-          onClick={() => handleEdit(empresa)}
+          onClick={() => handleEdit(turma)}
           style={{ cursor: "pointer" }}
           title="Editar"
         />{" "}
         <AiOutlineDelete
           size={20}
-          onClick={() => handleConfirm(empresa.codigo)}
+          onClick={() => handleConfirm(turma.codigo)}
           style={{ cursor: "pointer", color: "red" }}
           title="Excluir"
         />

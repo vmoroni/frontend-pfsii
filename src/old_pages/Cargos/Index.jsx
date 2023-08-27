@@ -1,45 +1,33 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Form from "./Form";
 import List from "./List";
-import { urlBase } from "../../utils/definicoes.js";
+import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function TelaCadastroFuncionarios(props) {
+export default function TelaCadastroCargos(props) {
   const [exibeTabela, setExibeTabela] = useState(true);
   const [onEdit, setOnEdit] = useState(null);
-  const [funcionarios, setFuncionarios] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [filtro, setFiltro] = useState("");
-
-  const getFuncionarios = async () => {
-    try {
-      const res = await axios.get(urlBase + "/funcionarios");
-      setFuncionarios(res.data);
-    } catch (error) {
-      toast.error(error);
-    }
-  };
 
   const getCargos = async () => {
     try {
       const res = await axios.get(urlBase + "/cargos");
       setCargos(res.data);
     } catch (error) {
-      toast.error(error.message);
-      console.log(error);
+      toast.error(error);
     }
   };
 
   useEffect(() => {
-    getFuncionarios();
     getCargos();
-  }, [setFuncionarios]);
+  }, [setCargos]);
 
   return exibeTabela ? (
     <List
-      funcionarios={funcionarios}
-      setFuncionarios={setFuncionarios}
+      cargos={cargos}
+      setCargos={setCargos}
       setOnEdit={setOnEdit}
       filtro={filtro}
       aoMudarFiltro={setFiltro}
@@ -47,10 +35,9 @@ export default function TelaCadastroFuncionarios(props) {
     />
   ) : (
     <Form
-      cargos={cargos}
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getFuncionarios={getFuncionarios}
+      getCargos={getCargos}
       setExibeTabela={setExibeTabela}
     />
   );

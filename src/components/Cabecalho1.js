@@ -22,7 +22,7 @@ export default function Cabecalho1(props) {
         <Menu />
         <div
           className="p-0 m-0"
-          style={{ fontWeight: "bold", fontSize: "20px" }}
+          style={{ fontWeight: "bold", fontSize: "2vw" }}
         >
           SGi | GERENCIAMENTO DE SERVIÇOS
         </div>

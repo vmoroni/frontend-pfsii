@@ -59,7 +59,7 @@ export default function TabelaCadastroCargos({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Cargos"} />
-      <Container className="mt-3">
+      <Container className="mt-3 overflow-auto">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
@@ -99,7 +99,7 @@ function LinhaCargo({ cargo, handleEdit, handleConfirm }) {
       <td>{cargo.codigo}</td>
       <td>{cargo.nome}</td>
       <td>{cargo.descricao}</td>
-      <td className="d-flex justify-content-around">
+      <td>
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(cargo)}

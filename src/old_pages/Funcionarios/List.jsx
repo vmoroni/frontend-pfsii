@@ -7,9 +7,9 @@ import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function TabelaCadastroEmpresas({
-  empresas,
-  setEmpresas,
+export default function TabelaCadastroFuncionarios({
+  funcionarios,
+  setFuncionarios,
   filtro,
   aoMudarFiltro,
   setOnEdit,
@@ -25,13 +25,13 @@ export default function TabelaCadastroEmpresas({
 
   const handleDelete = async (codigo) => {
     await axios
-      .delete(`${urlBase}/empresas/${codigo}`)
+      .delete(`${urlBase}/funcionarios/${codigo}`)
       .then(({ data }) => {
-        const newArray = empresas.filter(
-          (empresa) => empresa.codigo !== codigo
+        const newArray = funcionarios.filter(
+          (funcionario) => funcionario.codigo !== codigo
         );
 
-        setEmpresas(newArray);
+        setFuncionarios(newArray);
         toast.info(data.mensagem);
       })
       .catch(({ response }) => toast.error(response.data.mensagem));
@@ -44,15 +44,13 @@ export default function TabelaCadastroEmpresas({
     setExibeTabela(false);
   };
 
-  empresas.forEach((empresa, i) => {
-    if (
-      empresa.razao_social.toLowerCase().indexOf(filtro.toLowerCase()) === -1
-    ) {
+  funcionarios.forEach((funcionario, i) => {
+    if (funcionario.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
       return;
     }
     linhas.push(
-      <LinhaEmpresa
-        empresa={empresa}
+      <LinhaFuncionario
+        funcionario={funcionario}
         key={i}
         handleEdit={handleEdit}
         handleConfirm={confirmOnDelete}
@@ -62,15 +60,15 @@ export default function TabelaCadastroEmpresas({
 
   return (
     <div>
-      <Cabecalho2 texto1={"Consulta"} texto2={"Empresas"} />
-      <Container className="mt-3 overflow-auto">
+      <Cabecalho2 texto1={"Consulta"} texto2={"Funcionarios"} />
+      <Container className="mt-3">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
             <Form.Control
               type="text"
               value={filtro}
-              placeholder="Pesquisar por razão social..."
+              placeholder="Pesquisar por nome..."
               onChange={(e) => aoMudarFiltro(e.target.value)}
               style={{ width: "300px" }}
             />
@@ -80,12 +78,13 @@ export default function TabelaCadastroEmpresas({
           <thead>
             <tr>
               <th>#</th>
-              <th>Razão Social</th>
-              {/* <th>CNPJ</th> */}
-              <th>IE</th>
+              <th>CPF</th>
+              <th>Nome</th>
+              <th>Usuário</th>
+              <th>Cargo</th>
               <th>Telefone</th>
-              {/* <th>E-mail</th> */}
-              <th>Proprietário</th>
+              <th>Status</th>
+              <th>E-mail</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -96,26 +95,27 @@ export default function TabelaCadastroEmpresas({
   );
 }
 
-function LinhaEmpresa({ empresa, handleEdit, handleConfirm }) {
+function LinhaFuncionario({ funcionario, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td>{empresa.codigo}</td>
-      <td>{empresa.razao_social}</td>
-      {/* <td>{empresa.cnpj}</td> */}
-      <td>{empresa.ie}</td>
-      <td>{empresa.telefone}</td>
-      {/* <td>{empresa.email}</td> */}
-      <td>{empresa.proprietario}</td>
-      <td>
+      <td>{funcionario.codigo}</td>
+      <td>{funcionario.cpf}</td>
+      <td>{funcionario.nome}</td>
+      <td>{funcionario.nome_usuario}</td>
+      <td>{funcionario.cargo_nome}</td>
+      <td>{funcionario.telefone}</td>
+      <td>{funcionario.status}</td>
+      <td>{funcionario.email}</td>
+      <td className="d-flex justify-content-around">
         <AiOutlineEdit
           size={20}
-          onClick={() => handleEdit(empresa)}
-          style={{ cursor: "pointer" }}
+          onClick={() => handleEdit(funcionario)}
+          style={{ cursor: "pointer",  }}
           title="Editar"
         />{" "}
-        <AiOutlineDelete
+        <AiOutlineDelete 
           size={20}
-          onClick={() => handleConfirm(empresa.codigo)}
+          onClick={() => handleConfirm(funcionario.codigo)}
           style={{ cursor: "pointer", color: "red" }}
           title="Excluir"
         />

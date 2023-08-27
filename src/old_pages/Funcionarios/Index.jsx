@@ -27,7 +27,6 @@ export default function TelaCadastroFuncionarios(props) {
       setCargos(res.data);
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
     }
   };
 

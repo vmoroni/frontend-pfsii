@@ -63,7 +63,7 @@ export default function TabelaCadastroEmpresas({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Empresas"} />
-      <Container className="mt-3 overflow-auto">
+      <Container className="mt-3">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
@@ -81,10 +81,10 @@ export default function TabelaCadastroEmpresas({
             <tr>
               <th>#</th>
               <th>Razão Social</th>
-              {/* <th>CNPJ</th> */}
+              <th>CNPJ</th>
               <th>IE</th>
               <th>Telefone</th>
-              {/* <th>E-mail</th> */}
+              <th>E-mail</th>
               <th>Proprietário</th>
               <th>Ações</th>
             </tr>
@@ -101,19 +101,19 @@ function LinhaEmpresa({ empresa, handleEdit, handleConfirm }) {
     <tr>
       <td>{empresa.codigo}</td>
       <td>{empresa.razao_social}</td>
-      {/* <td>{empresa.cnpj}</td> */}
+      <td>{empresa.cnpj}</td>
       <td>{empresa.ie}</td>
       <td>{empresa.telefone}</td>
-      {/* <td>{empresa.email}</td> */}
+      <td>{empresa.email}</td>
       <td>{empresa.proprietario}</td>
-      <td>
+      <td className="d-flex justify-content-around">
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(empresa)}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer",  }}
           title="Editar"
         />{" "}
-        <AiOutlineDelete
+        <AiOutlineDelete 
           size={20}
           onClick={() => handleConfirm(empresa.codigo)}
           style={{ cursor: "pointer", color: "red" }}
