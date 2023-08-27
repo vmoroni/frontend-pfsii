@@ -5,7 +5,6 @@ import Cabecalho2 from "../../components/Cabecalho2";
 import { urlBase } from "../../utils/definicoes";
 import { toast } from "react-toastify";
 import axios from "axios";
-import SearchBar from "../../components/SearchBar/Index";
 
 export default function FormTurma({
   cursos,
@@ -16,8 +15,6 @@ export default function FormTurma({
   getTurmas,
 }) {
   const [validated, setValidated] = useState(false);
-  const [selectedCurso, setSelectedCurso] = useState({});
-  const [selectedProf, setSelectedProf] = useState({});
   const ref = useRef();
 
   useEffect(() => {
@@ -30,8 +27,8 @@ export default function FormTurma({
       turma.dt_fim.value = onEdit.dt_fim;
       turma.status.value = onEdit.status;
       turma.vagas.value = onEdit.vagas;
-      // turma.funcionario.value = onEdit.Funcionario_codigo;
-      // turma.curso.value = onEdit.Curso_codigo;
+      turma.funcionario.value = onEdit.Funcionario_codigo;
+      turma.curso.value = onEdit.Curso_codigo;
     }
   }, [onEdit]);
 
@@ -160,17 +157,17 @@ export default function FormTurma({
                       </option>
                     );
                   })}
+
+                  {/* <option value="Técnicas em Serviços de Supermercados">
+                    Técnicas em Serviços de Supermercados
+                  </option>
+                  <option value="Informática">
+                    Informática
+                  </option>
+                  <option value="Comunicação e Linguagem e Informática">
+                    Comunicação e Linguagem e Informática
+                  </option> */}
                 </Form.Select>
-                {/* <SearchBar
-                  placeholder="Informe o curso"
-                  data={cursos}
-                  keyField="codigo"
-                  searchField="nome"
-                  select={setSelectedCurso}
-                  // value=""
-                  name="curso"
-                  controlId="formCurso"
-                /> */}
                 <Form.Control.Feedback type="invalid">
                   Escolha do curso é obrigatório!
                 </Form.Control.Feedback>
@@ -228,15 +225,20 @@ export default function FormTurma({
             <Col>
               <Form.Group>
                 <Form.Label>Professor</Form.Label>
-                <SearchBar
-                  placeholder="Informe o professor"
-                  data={funcionarios}
-                  keyField="codigo_funcionario"
-                  searchField="nome"
-                  select={setSelectedProf}
-                  // value=""
-                  name="Funcionario_codigo"
-                />
+                <Form.Select name="funcionario" required>
+                  <option value="">Selecione</option>
+                  {funcionarios.map((funcionario, i) => { //funcionarios é o array que vem do banco de dados
+                    return (
+                      <option value={funcionario.codigo_funcionario} key={i}>
+                        {funcionario.nome}
+                      </option>
+                    );
+                  })}
+
+                  {/* <option value="Aglaê">Aglaê</option>
+                  <option value="Renato">Renato</option>
+                  <option value="Mario">Mario</option> */}
+                </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   Professor da turma é obrigatório!
                 </Form.Control.Feedback>

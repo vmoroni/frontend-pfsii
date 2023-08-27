@@ -31,7 +31,7 @@ export default function Menu() {
                   Home
                 </Nav.Link>
                 <NavDropdown title="Cadastro" id={`offcanvasNavbarDropdown`}>
-                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/alunos">
+                  {/* <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/alunos">
                     Alunos
                   </NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/cargos">
@@ -45,7 +45,7 @@ export default function Menu() {
                   </NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/funcionarios">
                     Funcionarios
-                  </NavDropdown.Item>
+                  </NavDropdown.Item> */}
                   <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/turmas">
                     Turmas
                   </NavDropdown.Item>
