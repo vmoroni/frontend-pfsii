@@ -26,15 +26,15 @@ export default function TabelaCadastroFuncionarios({
   const handleDelete = async (codigo) => {
     await axios
       .delete(`${urlBase}/funcionarios/${codigo}`)
-      .then(({ data }) => {
+      .then((response) => {
         const newArray = funcionarios.filter(
           (funcionario) => funcionario.codigo !== codigo
         );
 
         setFuncionarios(newArray);
-        toast.info(data.mensagem);
+        toast.success(response.data.message);
       })
-      .catch(({ response }) => toast.error(response.data.mensagem));
+      .catch(({ response }) => toast.error(response.data.message));
 
     setOnEdit(null);
   };
@@ -101,8 +101,8 @@ function LinhaFuncionario({ funcionario, handleEdit, handleConfirm }) {
       <td>{funcionario.codigo}</td>
       <td>{funcionario.nome}</td>
       <td>{funcionario.cpf}</td>
-      {/* <td>{funcionario.nome_usuario}</td> */}
-      <td>{funcionario.cargo_nome}</td>
+      {/* <td>{funcionario.nomeUsuario}</td> */}
+      <td>{funcionario.cargo.nome}</td>
       {/* <td>{funcionario.telefone}</td> */}
       <td>{funcionario.status}</td>
       {/* <td>{funcionario.email}</td> */}
@@ -110,10 +110,10 @@ function LinhaFuncionario({ funcionario, handleEdit, handleConfirm }) {
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(funcionario)}
-          style={{ cursor: "pointer",  }}
+          style={{ cursor: "pointer" }}
           title="Editar"
         />{" "}
-        <AiOutlineDelete 
+        <AiOutlineDelete
           size={20}
           onClick={() => handleConfirm(funcionario.codigo)}
           style={{ cursor: "pointer", color: "red" }}

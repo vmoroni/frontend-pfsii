@@ -26,13 +26,15 @@ export default function TabelaCadastroAlunos({
   const handleDelete = async (codigo) => {
     await axios
       .delete(`${urlBase}/alunos/${codigo}`)
-      .then(({ data }) => {
+      .then((response) => {
         const newArray = alunos.filter((aluno) => aluno.codigo !== codigo);
 
         setAlunos(newArray);
-        toast.info(data.mensagem);
+        toast.success(response.data.message);
       })
-      .catch(({ response }) => toast.error(response.data.mensagem));
+      .catch(({ response }) =>
+        toast.error(response.data.message)
+      );
 
     setOnEdit(null);
   };
@@ -108,10 +110,10 @@ function LinhaAluno({ aluno, handleEdit, handleConfirm }) {
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(aluno)}
-          style={{ cursor: "pointer",  }}
+          style={{ cursor: "pointer" }}
           title="Editar"
         />{" "}
-        <AiOutlineDelete 
+        <AiOutlineDelete
           size={20}
           onClick={() => handleConfirm(aluno.codigo)}
           style={{ cursor: "pointer", color: "red" }}

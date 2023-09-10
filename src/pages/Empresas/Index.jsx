@@ -14,9 +14,11 @@ export default function TelaCadastroEmpresas(props) {
   const getEmpresas = async () => {
     try {
       const res = await axios.get(urlBase + "/empresas");
-      setEmpresas(res.data);
-    } catch (error) {
-      toast.error(error);
+      if (Array.isArray(res.data)) {
+        setEmpresas(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(`Não foi possível obter empresas: ${response.data.message}`);
     }
   };
 
@@ -37,7 +39,8 @@ export default function TelaCadastroEmpresas(props) {
     <Form
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getEmpresas={getEmpresas}
+      empresas={empresas}
+      setEmpresas={setEmpresas}
       setExibeTabela={setExibeTabela}
     />
   );

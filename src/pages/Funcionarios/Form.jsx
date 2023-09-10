@@ -1,445 +1,422 @@
-import { Container, Col, Form, Row } from "react-bootstrap";
+import { Container, Col, Form, Row, Button } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
-import MenuFormulario from "../../components/MenuFormulario";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { cep, cpf, telefone } from "../../utils/masks";
+import SearchBar from "../../components/SearchBar/Index";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import FormTextField from "../../components/Form/form-field";
+import FormSelectField from "../../components/Form/form-select-field";
+import MaskedFormTextField from "../../components/Form/masked-form-field";
+import { emailRegex } from "../../utils/expressions";
+
+const schema = Yup.object().shape({
+  nome: Yup.string().required("Nome é obrigatório"),
+  cpf: Yup.string().required("CPF é obrigatório"),
+  dataNascimento: Yup.string().required("Data de nascimento é obrigatório"),
+  dataAdmissao: Yup.string().required("Data de admissão é obrigatório"),
+  // dataDemissao: Yup.string(),
+  status: Yup.string().required("Status é obrigatório"),
+  nomeUsuario: Yup.string().required("Usuário é obrigatório"),
+  senhaUsuario: Yup.string().required("Senha é obrigatório"),
+  cargo: Yup.object().required("Cargo é obrigatório"),
+  telefone: Yup.string().required("Telefone é obrigatório"),
+  email: Yup.string().required("E-mail é obrigatório")
+  .matches(emailRegex, "Endereço de email inválido"),
+  endereco: Yup.string().required("Endereço é obrigatório"),
+  bairro: Yup.string().required("Bairro é obrigatório"),
+  cidade: Yup.string().required("Cidade é obrigatório"),
+  cep: Yup.string().required("CEP é obrigatório"),
+  uf: Yup.string().required("UF é obrigatório"),
+});
+
+const initialValues = {
+  codigo: "",
+  nome: "",
+  cpf: "",
+  dataNascimento: "",
+  dataAdmissao: "",
+  dataDemissao: "",
+  status: "",
+  nomeUsuario: "",
+  senhaUsuario: "",
+  cargo: "",
+  telefone: "",
+  email: "",
+  endereco: "",
+  bairro: "",
+  cidade: "",
+  cep: "",
+  uf: "",
+};
+
+const options = {
+  headers: { "content-type": "application/json" },
+};
 
 export default function FormFuncionario({
   cargos,
   onEdit,
   setExibeTabela,
   setOnEdit,
-  getFuncionarios,
+  funcionarios,
+  setFuncionarios,
 }) {
-  const [validated, setValidated] = useState(false);
-  const ref = useRef();
+  const [selectedCargo, setSelectedCargo] = useState();
+  const formRef = useRef();
+  const formikRef = useRef();
 
   useEffect(() => {
     if (onEdit) {
-      const funcionario = ref.current;
-      funcionario.codigo.value = onEdit.codigo;
-      funcionario.cpf.value = onEdit.cpf;
-      funcionario.dt_nasc.value = onEdit.dt_nasc;
-      funcionario.dt_admissao.value = onEdit.dt_admissao;
-      funcionario.dt_demissao.value = onEdit.dt_demissao;
-      funcionario.status.value = onEdit.status;
-      funcionario.nome_usuario.value = onEdit.nome_usuario;
-      funcionario.senha_usuario.value = onEdit.senha_usuario;
-      funcionario.cargo.value = onEdit.Cargo_codigo;
-      funcionario.nome.value = onEdit.nome;
-      funcionario.telefone.value = onEdit.telefone;
-      funcionario.email.value = onEdit.email;
-      funcionario.endereco.value = onEdit.endereco;
-      funcionario.bairro.value = onEdit.bairro;
-      funcionario.cidade.value = onEdit.cidade;
-      funcionario.cep.value = onEdit.cep;
-      funcionario.uf.value = onEdit.uf;
+      for (const key in onEdit) {
+        // Set this condition only if the form has possibly nullable fields
+        if (onEdit[key] !== null) {
+          formikRef.current.setFieldValue(key, onEdit[key]);
+        }
+      }
+
+      setSelectedCargo({
+        codigo: onEdit.cargo.codigo,
+        nome: onEdit.cargo.nome,
+      });
     }
   }, [onEdit]);
-
-  const handleCpfMask = (e) => {
-    cpf(e);
-  };
-
-  const handleCepMask = (e) => {
-    cep(e);
-  };
-
-  const handleTelMask = (e) => {
-    telefone(e);
-  };
-
-  const clearForm = (funcionario) => {
-    funcionario.codigo.value = "";
-    funcionario.cpf.value = "";
-    funcionario.dt_nasc.value = "";
-    funcionario.dt_admissao.value = "";
-    funcionario.dt_demissao.value = "";
-    funcionario.status.value = "";
-    funcionario.nome_usuario.value = "";
-    funcionario.senha_usuario.value = "";
-    funcionario.cargo.value = "";
-    funcionario.nome.value = "";
-    funcionario.telefone.value = "";
-    funcionario.email.value = "";
-    funcionario.endereco.value = "";
-    funcionario.bairro.value = "";
-    funcionario.cidade.value = "";
-    funcionario.cep.value = "";
-    funcionario.uf.value = "";
-  };
 
   const handleBackButton = () => {
     if (onEdit) setOnEdit(null);
     setExibeTabela(true);
   };
 
-  const handleSubmit = async (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
+  const handleSubmit = async (values, actions) => {
+    const updatedFuncionarios = funcionarios;
 
-    const funcionario = ref.current;
-
-    if (form.checkValidity()) {
-      if (onEdit) {
-        await axios
-          .put(`${urlBase}/funcionarios/`, {
-            codigo: funcionario.codigo.value,
-            cpf: funcionario.cpf.value,
-            dt_nasc: funcionario.dt_nasc.value,
-            dt_admissao: funcionario.dt_admissao.value,
-            dt_demissao: funcionario.dt_demissao.value,
-            status: funcionario.status.value,
-            nome_usuario: funcionario.nome_usuario.value,
-            senha_usuario: funcionario.senha_usuario.value,
-            cargo: funcionario.cargo.value,
-            nome: funcionario.nome.value,
-            telefone: funcionario.telefone.value,
-            email: funcionario.email.value,
-            endereco: funcionario.endereco.value,
-            bairro: funcionario.bairro.value,
-            cidade: funcionario.cidade.value,
-            cep: funcionario.cep.value,
-            uf: funcionario.uf.value,
-          })
-          .then(({ data }) => {
-            toast.info(data.mensagem);
-            clearForm(funcionario);
-          })
-          .catch(({ response }) => toast.error(response.data.mensagem));
-      } else {
-        await axios
-          .post(`${urlBase}/funcionarios/`, {
-            cpf: funcionario.cpf.value,
-            dt_nasc: funcionario.dt_nasc.value,
-            dt_admissao: funcionario.dt_admissao.value,
-            dt_demissao: funcionario.dt_demissao.value,
-            status: funcionario.status.value,
-            nome_usuario: funcionario.nome_usuario.value,
-            senha_usuario: funcionario.senha_usuario.value,
-            cargo: funcionario.cargo.value,
-            nome: funcionario.nome.value,
-            telefone: funcionario.telefone.value,
-            email: funcionario.email.value,
-            endereco: funcionario.endereco.value,
-            bairro: funcionario.bairro.value,
-            cidade: funcionario.cidade.value,
-            cep: funcionario.cep.value,
-            uf: funcionario.uf.value,
-          })
-          .then(({ data }) => {
-            toast.info(data.mensagem);
-            clearForm(funcionario);
-          })
-          .catch(({ response }) => toast.error(response.data.mensagem));
-      }
-
-      getFuncionarios();
-
-      if (validated) {
-        setValidated(false);
-      }
+    if (onEdit) {
+      axios
+        .put(`${urlBase}/funcionarios/`, JSON.stringify(values), options)
+        .then((response) => {
+          // Get index of item on edition
+          const index = updatedFuncionarios.findIndex(
+            (i) => i.codigo === onEdit.codigo
+          );
+          // Replace old values
+          updatedFuncionarios[index] = values;
+          // Set new list
+          setFuncionarios(updatedFuncionarios);
+          toast.success(response.data.message);
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     } else {
-      setValidated(true);
+      axios
+        .post(`${urlBase}/funcionarios/`, JSON.stringify(values), options)
+        .then((response) => {
+          formikRef.current.setFieldValue("codigo", response.data.id);
+          values.codigo = response.data.id;
+          updatedFuncionarios.push(values);
+          setFuncionarios(updatedFuncionarios);
+          toast.success(response.data.message);
+          // After pushing new item to list, it goes to the end of it
+          // It must be treated on list
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     }
   };
 
   return (
     <div>
       <Cabecalho2 texto1={"Cadastro"} texto2={"Funcionario"} />
-      <Container className="mt-3">
-        <Form
-          method="POST"
-          action="#"
-          noValidate
-          validated={validated}
+      <Container
+        className="my-4 p-3 overflow-auto"
+        style={{ maxHeight: "75vh" }}
+      >
+        <Formik
+          innerRef={formikRef}
+          validationSchema={schema}
           onSubmit={handleSubmit}
-          ref={ref}
+          initialValues={initialValues}
+          enableReinitialize={true}
         >
-          <MenuFormulario acaoBtnVoltar={() => handleBackButton()} />
-          <Row>
-            <Col xs={6} sm={6} md={6} lg={6}>
-              <Form.Group>
-                <Form.Label>Código</Form.Label>
-                <Form.Control type="text" name="codigo" disabled />
-              </Form.Group>
-            </Col>
-            <Col></Col>
-          </Row>
-          <Row className="my-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Nome</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome"
-                  placeholder="Digite o nome do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Nome do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+            isValid,
+            isSubmitting,
+            dirty,
+          }) => (
+            <Form noValidate onSubmit={handleSubmit} ref={formRef}>
+              <Row>
+                <Col sm={2} md={2} lg={2} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.codigo"
+                    label="Código"
+                    name="codigo"
+                    value={values.codigo}
+                    isDisabled={true}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.nome"
+                    label="Nome"
+                    name="nome"
+                    placeholder="Informe o nome do funcionário"
+                    value={values.nome}
+                    required
+                  />
+                </Col>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>CPF</Form.Label>
-                <Form.Control
-                  onKeyUp={handleCpfMask}
-                  type="text"
-                  name="cpf"
-                  placeholder="Digite o CPF do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  CPF do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formFuncionario.cpf"
+                    label="CPF"
+                    name="cpf"
+                    placeholder="Informe o CPF do funcionário"
+                    format="###.###.###-##"
+                    mask="_"
+                    value={values.cpf}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.dataNascimento"
+                    label="Data de Nascimento"
+                    name="dataNascimento"
+                    type="date"
+                    value={values.dataNascimento}
+                    required
+                  />
+                </Col>
 
-            <Col>
-              <Form.Group>
-                <Form.Label>Data de Nascimento</Form.Label>
-                <Form.Control type="date" name="dt_nasc" required />
-                <Form.Control.Feedback type="invalid">
-                  Data de nascimento do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.dataAdmissao"
+                    label="Data de Admissão"
+                    name="dataAdmissao"
+                    type="date"
+                    value={values.dataAdmissao}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.dataDemissao"
+                    label="Data de Demissão"
+                    name="dataDemissao"
+                    type="date"
+                    value={values.dataDemissao}
+                  />
+                </Col>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Data de Admissão</Form.Label>
-                <Form.Control type="date" name="dt_admissao" required />
-                <Form.Control.Feedback type="invalid">
-                  Data de admissão do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+                <Col md={6} className="mb-3">
+                  <FormSelectField
+                    controlId="formFuncionario.status"
+                    label="Status"
+                    name="status"
+                    className="mb-3"
+                    value={values.status}
+                    required
+                  >
+                    <option value="">Selecione o status do funcionário</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Inativo">Inativo</option>
+                  </FormSelectField>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <SearchBar
+                    controlId="formFuncionario.cargo"
+                    label="Cargo"
+                    name="cargo"
+                    placeholder="Informe o cargo"
+                    data={cargos}
+                    keyField="codigo"
+                    searchField="nome"
+                    select={setSelectedCargo}
+                    selected={selectedCargo}
+                    value={values.cargo}
+                    required
+                  />
+                </Col>
 
-            <Col>
-              <Form.Group>
-                <Form.Label>Data de Demissão</Form.Label>
-                <Form.Control type="date" name="dt_demissao" />
-              </Form.Group>
-            </Col>
-          </Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.endereco"
+                    label="Endereço"
+                    name="endereco"
+                    placeholder="Informe o endereço do funcionário"
+                    value={values.endereco}
+                    required
+                  />
+                </Col>
+              </Row>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Status</Form.Label>
-                <Form.Select name="status" required>
-                  <option value="">Selecione</option>
-                  <option value="Ativo">Ativo</option>
-                  <option value="Inativo">Inativo</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  Status atual é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.bairro"
+                    label="Bairro"
+                    name="bairro"
+                    placeholder="Informe o bairro do funcionário"
+                    value={values.bairro}
+                    required
+                  />
+                </Col>
 
-            <Col>
-              <Form.Group>
-                <Form.Label>Cargo</Form.Label>
-                <Form.Select name="cargo" required>
-                  <option value="">Selecione</option>
-                  {cargos.map((cargo, i) => {
-                    return (
-                      <option value={cargo.codigo} key={i}>
-                        {cargo.nome}
-                      </option>
-                    );
-                  })}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  Cargo do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.cidade"
+                    label="Cidade"
+                    name="cidade"
+                    placeholder="Informe o cidade do funcionário"
+                    value={values.cidade}
+                    required
+                  />
+                </Col>
+              </Row>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Endereço</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="endereco"
-                  placeholder="Digite o endereço do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Endereco do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormSelectField
+                    controlId="formFuncionario.uf"
+                    label="UF"
+                    name="uf"
+                    className="mb-3"
+                    value={values.uf}
+                    required
+                  >
+                    <option value="">Selecione</option>
+                    <option value="AC">Acre</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option>
+                    <option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option>
+                    <option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option>
+                    <option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option>
+                    <option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option>
+                    <option value="MS">Mato Grosso do Sul</option>
+                    <option value="MG">Minas Gerais</option>
+                    <option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option>
+                    <option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
+                    <option value="EX">Estrangeiro</option>
+                  </FormSelectField>
+                </Col>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Bairro</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="bairro"
-                  placeholder="Digite o bairro do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Bairro do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formFuncionario.cep"
+                    label="CEP"
+                    name="cep"
+                    placeholder="Informe a CEP do funcionário"
+                    value={values.cep}
+                    format="#####-###"
+                    mask="_"
+                    required
+                  />
+                </Col>
+              </Row>
 
-            <Col>
-              <Form.Group>
-                <Form.Label>Cidade</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="cidade"
-                  placeholder="Digite a cidade do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Cidade do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formFuncionario.telefone"
+                    label="Telefone"
+                    name="telefone"
+                    placeholder="Informe o telefone do funcionário"
+                    value={values.telefone}
+                    format="(##) #####-####"
+                    mask="_"
+                    required
+                  />
+                </Col>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.email"
+                    label="E-mail"
+                    name="email"
+                    placeholder="Informe o e-mail do funcionário"
+                    value={values.email}
+                    required
+                  />
+                </Col>
+              </Row>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>UF</Form.Label>
-                <Form.Select name="uf" required>
-                  <option value="">Selecione</option>
-                  <option value="AC">Acre</option>
-                  <option value="AL">Alagoas</option>
-                  <option value="AP">Amapá</option>
-                  <option value="AM">Amazonas</option>
-                  <option value="BA">Bahia</option>
-                  <option value="CE">Ceará</option>
-                  <option value="DF">Distrito Federal</option>
-                  <option value="ES">Espírito Santo</option>
-                  <option value="GO">Goiás</option>
-                  <option value="MA">Maranhão</option>
-                  <option value="MT">Mato Grosso</option>
-                  <option value="MS">Mato Grosso do Sul</option>
-                  <option value="MG">Minas Gerais</option>
-                  <option value="PA">Pará</option>
-                  <option value="PB">Paraíba</option>
-                  <option value="PR">Paraná</option>
-                  <option value="PE">Pernambuco</option>
-                  <option value="PI">Piauí</option>
-                  <option value="RJ">Rio de Janeiro</option>
-                  <option value="RN">Rio Grande do Norte</option>
-                  <option value="RS">Rio Grande do Sul</option>
-                  <option value="RO">Rondônia</option>
-                  <option value="RR">Roraima</option>
-                  <option value="SC">Santa Catarina</option>
-                  <option value="SP">São Paulo</option>
-                  <option value="SE">Sergipe</option>
-                  <option value="TO">Tocantins</option>
-                  <option value="EX">Estrangeiro</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  UF é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.nomeUsuario"
+                    label="Usuário"
+                    name="nomeUsuario"
+                    placeholder="Informe um nome de usuário ao funcionário"
+                    value={values.nomeUsuario}
+                    required
+                  />
+                </Col>
 
-            <Col>
-              <Form.Group>
-                <Form.Label>CEP</Form.Label>
-                <Form.Control
-                  onKeyUp={handleCepMask}
-                  type="text"
-                  name="cep"
-                  placeholder="Digite o CEP do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  CEP do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Telefone/Celular</Form.Label>
-                <Form.Control
-                  onKeyUp={handleTelMask}
-                  type="text"
-                  name="telefone"
-                  placeholder="Digite o telefone/celular do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Telefone/celular do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-
-            <Col>
-              <Form.Group>
-                <Form.Label>E-mail</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  placeholder="Digite o email do funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  E-mail do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Usuario</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome_usuario"
-                  placeholder="Digite um usuário para o funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Usuário do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-
-            <Col>
-              <Form.Group>
-                <Form.Label>Senha</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="senha_usuario"
-                  placeholder="Digite uma senha para o funcionário"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Senha do funcionário é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-        </Form>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formFuncionario.senhaUsuario"
+                    label="Senha"
+                    name="senhaUsuario"
+                    type="password"
+                    placeholder="Informe uma senha de usuário ao funcionário"
+                    value={values.senhaUsuario}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex">
+                  <Button
+                    disabled={isSubmitting}
+                    as="input"
+                    size="md"
+                    type="submit"
+                    value="Salvar"
+                    className="me-2"
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    as="input"
+                    size="md"
+                    type="button"
+                    value="Voltar"
+                    onClick={handleBackButton}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Formik>
       </Container>
     </div>
   );

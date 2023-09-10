@@ -16,27 +16,35 @@ export default function TelaCadastroTurmas(props) {
   const getTurmas = async () => {
     try {
       const res = await axios.get(urlBase + "/turmas");
-      setTurmas(res.data.sort((a, b) => (a.codigo > b.codigo ? 1 : -1)));
-    } catch (error) {
-      toast.error(error);
+      if (Array.isArray(res.data)) {
+        setTurmas(res.data.sort((a, b) => (a.codigo > b.codigo ? 1 : -1)));
+      }
+    } catch ({ response }) {
+      toast.error(`Não foi possível obter turmas: ${response.data.message}`);
     }
   };
 
   const getFuncionarios = async () => {
     try {
       const res = await axios.get(urlBase + "/funcionarios/professor");
-      setFuncionarios(res.data);
-    } catch (error) {
-      toast.error(error);
+      if (Array.isArray(res.data)) {
+        setFuncionarios(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(
+        `Não foi possível obter funcionários: ${response.data.message}`
+      );
     }
   };
 
   const getCursos = async () => {
     try {
       const res = await axios.get(urlBase + "/cursos");
-      setCursos(res.data);
-    } catch (error) {
-      toast.error(error.message);
+      if (Array.isArray(res.data)) {
+        setCursos(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(`Não foi possível obter cursos: ${response.data.message}`);
     }
   };
 
@@ -61,7 +69,8 @@ export default function TelaCadastroTurmas(props) {
       funcionarios={funcionarios}
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getTurmas={getTurmas}
+      turmas={turmas}
+      setTurmas={setTurmas}
       setExibeTabela={setExibeTabela}
     />
   );

@@ -1,353 +1,339 @@
-import { Container, Col, Form, Row } from "react-bootstrap";
-import { useEffect, useRef, useState } from "react";
-import MenuFormulario from "../../components/MenuFormulario";
+import { Container, Col, Form, Row, Button } from "react-bootstrap";
+import { useEffect, useRef } from "react";
 import Cabecalho2 from "../../components/Cabecalho2";
-import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { cep, cnpj, telefone } from "../../utils/masks";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import FormTextField from "../../components/Form/form-field";
+import FormSelectField from "../../components/Form/form-select-field";
+import { emailRegex } from "../../utils/expressions";
+import { urlBase } from "../../utils/definicoes";
+import MaskedFormTextField from "../../components/Form/masked-form-field";
+
+const schema = Yup.object().shape({
+  cnpj: Yup.string().required("CNPJ é obrigatório"),
+  ie: Yup.string().required("Inscrição estadual é obrigatório"),
+  razaoSocial: Yup.string().required("Razão social é obrigatório"),
+  telefone: Yup.string().required("Telefone é obrigatório"),
+  // Regex to validate email format, need to break this expression in multilines
+  email: Yup.string()
+    .required("E-mail é obrigatório")
+    .matches(emailRegex, "Endereço de email inválido"),
+  proprietario: Yup.string().required("Proprietário é obrigatório"),
+  endereco: Yup.string().required("Endereço é obrigatório"),
+  bairro: Yup.string().required("Bairro é obrigatório"),
+  cidade: Yup.string().required("Cidade é obrigatório"),
+  cep: Yup.string().required("CEP é obrigatório"),
+  uf: Yup.string().required("UF é obrigatório"),
+});
+
+const initialValues = {
+  codigo: "",
+  cnpj: "",
+  ie: "",
+  razaoSocial: "",
+  telefone: "",
+  email: "",
+  proprietario: "",
+  endereco: "",
+  bairro: "",
+  cidade: "",
+  cep: "",
+  uf: "",
+};
+
+const options = {
+  headers: { "content-type": "application/json" },
+};
 
 export default function FormEmpresa({
   onEdit,
   setExibeTabela,
   setOnEdit,
-  getEmpresas,
+  empresas,
+  setEmpresas,
 }) {
-  const [validated, setValidated] = useState(false);
-  const ref = useRef();
+  const formRef = useRef();
+  const formikRef = useRef();
 
   useEffect(() => {
     if (onEdit) {
-      const empresa = ref.current;
-      empresa.codigo.value = onEdit.codigo;
-      empresa.cnpj.value = onEdit.cnpj;
-      empresa.ie.value = onEdit.ie;
-      empresa.razao_social.value = onEdit.razao_social;
-      empresa.telefone.value = onEdit.telefone;
-      empresa.email.value = onEdit.email;
-      empresa.proprietario.value = onEdit.proprietario;
-      empresa.endereco.value = onEdit.endereco;
-      empresa.bairro.value = onEdit.bairro;
-      empresa.cidade.value = onEdit.cidade;
-      empresa.cep.value = onEdit.cep;
-      empresa.uf.value = onEdit.uf;
+      for (const key in onEdit) {
+        // Set this condition only if the form has possibly nullable fields
+        if (onEdit[key] !== null) {
+          formikRef.current.setFieldValue(key, onEdit[key]);
+        }
+      }
     }
   }, [onEdit]);
-
-  const handleCepMask = (e) => {
-    cep(e);
-  };
-
-  const handleCnpjMask = (e) => {
-    cnpj(e);
-  };
-
-  const handleTelMask = (e) => {
-    telefone(e);
-  };
-
-  const clearForm = (empresa) => {
-    empresa.codigo.value = "";
-    empresa.cnpj.value = "";
-    empresa.ie.value = "";
-    empresa.razao_social.value = "";
-    empresa.telefone.value = "";
-    empresa.email.value = "";
-    empresa.proprietario.value = "";
-    empresa.endereco.value = "";
-    empresa.bairro.value = "";
-    empresa.cidade.value = "";
-    empresa.cep.value = "";
-    empresa.uf.value = "";
-  };
 
   const handleBackButton = () => {
     if (onEdit) setOnEdit(null);
     setExibeTabela(true);
   };
 
-  const handleSubmit = async (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
+  // Submissão dos dados
+  const handleSubmit = async (values, actions) => {
+    const updatedEmpresas = empresas;
 
-    const empresa = ref.current;
-
-    if (form.checkValidity()) {
-      if (onEdit) {
-        await axios
-          .put(`${urlBase}/empresas/`, {
-            codigo: empresa.codigo.value,
-            cnpj: empresa.cnpj.value,
-            ie: empresa.ie.value,
-            razao_social: empresa.razao_social.value,
-            telefone: empresa.telefone.value,
-            email: empresa.email.value,
-            proprietario: empresa.proprietario.value,
-            endereco: empresa.endereco.value,
-            bairro: empresa.bairro.value,
-            cidade: empresa.cidade.value,
-            cep: empresa.cep.value,
-            uf: empresa.uf.value,
-          })
-          .then(({ data }) => {
-            toast.info(data.mensagem);
-            clearForm(empresa);
-          })
-          .catch(({ response }) => {
-            toast.error(response.data.mensagem);
-          });
-      } else {
-        await axios
-          .post(`${urlBase}/empresas/`, {
-            cnpj: empresa.cnpj.value,
-            ie: empresa.ie.value,
-            razao_social: empresa.razao_social.value,
-            telefone: empresa.telefone.value,
-            email: empresa.email.value,
-            proprietario: empresa.proprietario.value,
-            endereco: empresa.endereco.value,
-            bairro: empresa.bairro.value,
-            cidade: empresa.cidade.value,
-            cep: empresa.cep.value,
-            uf: empresa.uf.value,
-          })
-          .then(({ data }) => {
-            toast.info(data.mensagem);
-            clearForm(empresa);
-          })
-          .catch(({ response }) => {
-            toast.error(response.data.mensagem);
-          });
-      }
-
-      if (setValidated) {
-        setValidated(false);
-      }
-
-      getEmpresas();
+    if (onEdit) {
+      axios
+        .put(`${urlBase}/empresas/`, JSON.stringify(values), options)
+        .then((response) => {
+          // Get index of item on edition
+          const index = updatedEmpresas.findIndex(
+            (i) => i.codigo === onEdit.codigo
+          );
+          // Replace old values
+          updatedEmpresas[index] = values;
+          // Set new list
+          setEmpresas(updatedEmpresas);
+          toast.success(response.data.message);
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     } else {
-      setValidated(true);
+      axios
+        .post(`${urlBase}/empresas/`, JSON.stringify(values), options)
+        .then((response) => {
+          formikRef.current.setFieldValue("codigo", response.data.id);
+          values.codigo = response.data.id;
+          updatedEmpresas.push(values);
+          setEmpresas(updatedEmpresas);
+          toast.success(response.data.message);
+          // After pushing new item to list, it goes to the end of it
+          // It must be treated on list
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     }
   };
 
   return (
     <div>
       <Cabecalho2 texto1={"Cadastro"} texto2={"Empresa"} />
-      <Container className="mt-3">
-        <Form
-          method="POST"
-          action="#"
-          noValidate
-          validated={validated}
+      <Container
+        className="my-4 p-3 overflow-auto"
+        style={{ maxHeight: "75vh" }}
+      >
+        <Formik
+          innerRef={formikRef}
+          validationSchema={schema}
           onSubmit={handleSubmit}
-          ref={ref}
+          initialValues={initialValues}
+          enableReinitialize={true}
         >
-          <MenuFormulario acaoBtnVoltar={() => handleBackButton()} />
-          <Row>
-            <Col xs={6} sm={6} md={6} lg={6}>
-              <Form.Group>
-                <Form.Label>Código</Form.Label>
-                <Form.Control type="text" name="codigo" disabled />
-              </Form.Group>
-            </Col>
-            <Col></Col>
-          </Row>
-          <Row className="my-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>CNPJ</Form.Label>
-                <Form.Control
-                  onKeyUp={handleCnpjMask}
-                  type="text"
-                  name="cnpj"
-                  placeholder="Digite o CNPJ da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  CNPJ da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Inscrição Estadual</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="ie"
-                  maxLength={12}
-                  placeholder="Digite a I.E. da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  IE da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Razão Social</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="razao_social"
-                  placeholder="Digite a razão social da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Razão social da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Proprietário</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="proprietario"
-                  placeholder="Digite o proprietário da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Razão social da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Endereco</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="endereco"
-                  placeholder="Digite o endereço da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Logradouro é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Bairro</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="bairro"
-                  placeholder="Digite o bairro da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Bairro é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Cidade</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="cidade"
-                  placeholder="Digite a cidade da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Município da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>UF</Form.Label>
-                <Form.Select name="uf" required>
-                  <option value="">Selecione</option>
-                  <option value="AC">Acre</option>
-                  <option value="AL">Alagoas</option>
-                  <option value="AP">Amapá</option>
-                  <option value="AM">Amazonas</option>
-                  <option value="BA">Bahia</option>
-                  <option value="CE">Ceará</option>
-                  <option value="DF">Distrito Federal</option>
-                  <option value="ES">Espírito Santo</option>
-                  <option value="GO">Goiás</option>
-                  <option value="MA">Maranhão</option>
-                  <option value="MT">Mato Grosso</option>
-                  <option value="MS">Mato Grosso do Sul</option>
-                  <option value="MG">Minas Gerais</option>
-                  <option value="PA">Pará</option>
-                  <option value="PB">Paraíba</option>
-                  <option value="PR">Paraná</option>
-                  <option value="PE">Pernambuco</option>
-                  <option value="PI">Piauí</option>
-                  <option value="RJ">Rio de Janeiro</option>
-                  <option value="RN">Rio Grande do Norte</option>
-                  <option value="RS">Rio Grande do Sul</option>
-                  <option value="RO">Rondônia</option>
-                  <option value="RR">Roraima</option>
-                  <option value="SC">Santa Catarina</option>
-                  <option value="SP">São Paulo</option>
-                  <option value="SE">Sergipe</option>
-                  <option value="TO">Tocantins</option>
-                  <option value="EX">Estrangeiro</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  UF é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>CEP</Form.Label>
-                <Form.Control
-                  onKeyUp={handleCepMask}
-                  type="text"
-                  name="cep"
-                  placeholder="Digite o CEP da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  CEP da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Telefone</Form.Label>
-                <Form.Control
-                  onKeyUp={handleTelMask}
-                  type="text"
-                  name="telefone"
-                  placeholder="Digite o telefone da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Telefone da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>E-mail</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  placeholder="Digite o email da empresa"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  E-mail da empresa é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-        </Form>
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+            isValid,
+            isSubmitting,
+            dirty,
+          }) => (
+            <Form noValidate onSubmit={handleSubmit} ref={formRef}>
+              <Row>
+                <Col sm={2} md={2} lg={2} className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.codigo"
+                    label="Código"
+                    name="codigo"
+                    value={values.codigo}
+                    isDisabled={true}
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.razaoSocial"
+                    label="Razão Social"
+                    name="razaoSocial"
+                    placeholder="Informe a Razão Social da empresa"
+                    value={values.razaoSocial}
+                    required
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formEmpresa.cnpj"
+                    label="CNPJ"
+                    name="cnpj"
+                    format="##.###.###/####-##"
+                    mask="_"
+                    placeholder="Informe o CPNJ da empresa"
+                    value={values.cnpj}
+                    required
+                  />
+                </Col>
+
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.ie"
+                    label="Inscrição Estadual"
+                    name="ie"
+                    placeholder="Informe a Inscrição Estadual da empresa"
+                    value={values.ie}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.proprietario"
+                    label="Proprietário"
+                    name="proprietario"
+                    placeholder="Informe a Proprietário da empresa"
+                    value={values.proprietario}
+                    required
+                  />
+                </Col>
+
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formEmpresa.cep"
+                    label="CEP"
+                    name="cep"
+                    format="######-###"
+                    mask="_"
+                    placeholder="Informe a CEP da empresa"
+                    value={values.cep}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.endereco"
+                    label="Endereço"
+                    name="endereco"
+                    placeholder="Informe a Endereço da empresa"
+                    value={values.endereco}
+                    required
+                  />
+                </Col>
+
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.bairro"
+                    label="Bairro"
+                    name="bairro"
+                    placeholder="Informe a Bairro da empresa"
+                    value={values.bairro}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.cidade"
+                    label="Cidade"
+                    name="cidade"
+                    placeholder="Informe a cidade da empresa"
+                    value={values.cidade}
+                    required
+                  />
+                </Col>
+                <Col md={6} className="mb-3">
+                  <FormSelectField
+                    controlId="formEmpresa.uf"
+                    label="UF"
+                    name="uf"
+                    className="mb-3"
+                    value={values.uf}
+                    required
+                  >
+                    <option value="">Selecione</option>
+                    <option value="AC">Acre</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option>
+                    <option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option>
+                    <option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option>
+                    <option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option>
+                    <option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option>
+                    <option value="MS">Mato Grosso do Sul</option>
+                    <option value="MG">Minas Gerais</option>
+                    <option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option>
+                    <option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
+                    <option value="EX">Estrangeiro</option>
+                  </FormSelectField>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formEmpresa.telefone"
+                    label="Telefone"
+                    name="telefone"
+                    format="(##) #####-####"
+                    mask="_"
+                    placeholder="Informe a telefone da empresa"
+                    value={values.telefone}
+                    required
+                  />
+                </Col>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formEmpresa.email"
+                    label="E-mail"
+                    name="email"
+                    type="email"
+                    placeholder="Informe a e-mail da empresa"
+                    value={values.email}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex">
+                  <Button
+                    disabled={isSubmitting}
+                    as="input"
+                    size="md"
+                    type="submit"
+                    value="Salvar"
+                    className="me-2"
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    as="input"
+                    size="md"
+                    type="button"
+                    value="Voltar"
+                    onClick={handleBackButton}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Formik>
       </Container>
     </div>
   );

@@ -1,26 +1,47 @@
-import { Container, Col, Form, Row } from "react-bootstrap";
-import { useEffect, useRef, useState } from "react";
-import MenuFormulario from "../../components/MenuFormulario";
+import { Container, Col, Form, Row, Button } from "react-bootstrap";
+import { useEffect, useRef } from "react";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { urlBase } from "../../utils/definicoes";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import FormTextField from "../../components/Form/form-field";
+import FormTextAreaField from "../../components/Form/form-textarea";
+
+const schema = Yup.object().shape({
+  nome: Yup.string().required("Nome é obrigatório"),
+  descricao: Yup.string().required("Descrição é obrigatório"),
+});
+
+const initialValues = {
+  codigo: "",
+  nome: "",
+  descricao: "",
+};
+
+const options = {
+  headers: { "content-type": "application/json" },
+};
 
 export default function FormCargo({
   onEdit,
   setExibeTabela,
   setOnEdit,
-  getCargos,
+  cargos,
+  setCargos,
 }) {
-  const [validated, setValidated] = useState(false);
-  const ref = useRef();
+  const formRef = useRef();
+  const formikRef = useRef();
 
   useEffect(() => {
     if (onEdit) {
-      const cargo = ref.current;
-      cargo.codigo.value = onEdit.codigo;
-      cargo.nome.value = onEdit.nome;
-      cargo.descricao.value = onEdit.descricao;
+      for (const key in onEdit) {
+        // Set this condition only if the form has possibly nullable fields
+        if (onEdit[key] !== null) {
+          formikRef.current.setFieldValue(key, onEdit[key]);
+        }
+      }
     }
   }, [onEdit]);
 
@@ -29,103 +50,122 @@ export default function FormCargo({
     setExibeTabela(true);
   };
 
-  const handleSubmit = async (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
+  const handleSubmit = async (values, actions) => {
+    const updatedCargos = cargos;
 
-    const cargo = ref.current;
-
-    if (form.checkValidity()) {
-      if (onEdit) {
-        await axios
-          .put(urlBase + "/cargos/", {
-            codigo: cargo.codigo.value,
-            nome: cargo.nome.value,
-            descricao: cargo.descricao.value,
-          })
-          .then(({ data }) => toast.info(data.mensagem))
-          .catch(({ data }) => toast.error(data.mensagem));
-      } else {
-        await axios
-          .post(urlBase + "/cargos/", {
-            codigo: cargo.codigo.value,
-            nome: cargo.nome.value,
-            descricao: cargo.descricao.value,
-          })
-          .then(({ data }) => toast.info(data.mensagem))
-          .catch(({ data }) => toast.error(data.mensagem));
-      }
-
-      cargo.codigo.value = "";
-      cargo.nome.value = "";
-      cargo.descricao.value = "";
-
-      getCargos();
+    if (onEdit) {
+      axios
+        .put(`${urlBase}/cargos/`, JSON.stringify(values), options)
+        .then((response) => {
+          const index = updatedCargos.findIndex(
+            (i) => i.codigo === onEdit.codigo
+          );
+          updatedCargos[index] = values;
+          setCargos(updatedCargos);
+          toast.success(response.data.message);
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     } else {
-      setValidated(true);
+      axios
+        .post(`${urlBase}/cargos/`, JSON.stringify(values), options)
+        .then((response) => {
+          formikRef.current.setFieldValue("codigo", response.data.id);
+          values.codigo = response.data.id;
+          updatedCargos.push(values);
+          setCargos(updatedCargos);
+          toast.success(response.data.message);
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     }
   };
 
   return (
     <div>
       <Cabecalho2 texto1={"Cadastro"} texto2={"Cargo"} />
-      <Container className="mt-3">
-        <Form
-          method="POST"
-          action="#"
-          noValidate
-          validated={validated}
+      <Container
+        className="my-4 p-3 overflow-auto"
+        style={{ maxHeight: "75vh" }}
+      >
+        <Formik
+          innerRef={formikRef}
+          validationSchema={schema}
           onSubmit={handleSubmit}
-          ref={ref}
+          initialValues={initialValues}
+          enableReinitialize={true}
         >
-          <MenuFormulario acaoBtnVoltar={() => handleBackButton()} />
-          <Row>
-            <Col md={6}  className="mb-3">
-              <Form.Group>
-                <Form.Label>Código</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="codigo"
-                  disabled
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+            isValid,
+            isSubmitting,
+            dirty,
+          }) => (
+            <Form noValidate onSubmit={handleSubmit} ref={formRef}>
+              <Row>
+                <Col sm={2} md={2} lg={2} className="mb-3">
+                  <FormTextField
+                    controlId="formCargo.codigo"
+                    label="Código"
+                    name="codigo"
+                    value={values.codigo}
+                    isDisabled={true}
+                  />
+                </Col>
+              </Row>
 
-          <Row>
-            <Col  className="mb-3">
-              <Form.Group>
-                <Form.Label>Cargo</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome"
-                  // placeholder="Digite o nome do cargo"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Nome do cargo é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+              <Row>
+                <Col className="mb-3">
+                  <FormTextField
+                    controlId="formCargo.nome"
+                    label="Nome"
+                    name="nome"
+                    placeholder="Informe o nome do cargo"
+                    value={values.nome}
+                    required
+                  />
+                </Col>
+              </Row>
 
-          <Row>
-            <Col  className="mb-3">
-              <Form.Group>
-                <Form.Label>Descrição</Form.Label>
-                <Form.Control style={{ resize: "none" }}
-                  as="textarea"
-                  name="descricao"
-                  // placeholder="Digite uma descrição sobre o cargo"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Descrição é obrigatória!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-        </Form>
+              <Row>
+                <Col className="mb-3">
+                  <FormTextAreaField
+                    controlId="formCargo.descricao"
+                    label="Descrição"
+                    name="descricao"
+                    value={values.descricao}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex">
+                  <Button
+                    disabled={isSubmitting}
+                    as="input"
+                    size="md"
+                    type="submit"
+                    value="Salvar"
+                    className="me-2"
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    as="input"
+                    size="md"
+                    type="button"
+                    value="Voltar"
+                    onClick={handleBackButton}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Formik>
       </Container>
     </div>
   );

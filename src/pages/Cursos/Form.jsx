@@ -1,30 +1,54 @@
-import { Container, Col, Form, Row } from "react-bootstrap";
-import { useEffect, useRef, useState } from "react";
-import MenuFormulario from "../../components/MenuFormulario";
+import { Container, Col, Form, Row, Button } from "react-bootstrap";
+import { useRef, useEffect } from "react";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { urlBase } from "../../utils/definicoes";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import FormTextField from "../../components/Form/form-field";
+
+const schema = Yup.object().shape({
+  nome: Yup.string().required("Nome do curso é obrigatório"),
+  sala: Yup.string().required("Sala do curso é obrigatório"),
+  eixo: Yup.string().required("Eixo formativo do curso é obrigatório"),
+  cargaHoras: Yup.string().required("Carga de horas é obrigatório"),
+  dataCriacao: Yup.string().required("Data de criação é obrigatório"),
+  dataDesativacao: Yup.string(),
+});
+
+const initialValues = {
+  codigo: "",
+  nome: "",
+  sala: "",
+  eixo: "",
+  cargaHoras: "",
+  dataCriacao: "",
+  dataDesativacao: "",
+};
+
+const options = {
+  headers: { "content-type": "application/json" },
+};
 
 export default function FormCurso({
   onEdit,
   setExibeTabela,
   setOnEdit,
-  getCursos,
+  cursos,
+  setCursos,
 }) {
-  const [validated, setValidated] = useState(false);
-  const ref = useRef();
+  const formRef = useRef();
+  const formikRef = useRef();
 
   useEffect(() => {
     if (onEdit) {
-      const curso = ref.current;
-      curso.codigo.value = onEdit.codigo;
-      curso.nome.value = onEdit.nome;
-      curso.sala.value = onEdit.sala;
-      curso.eixo.value = onEdit.eixo;
-      curso.carga_horas.value = onEdit.carga_horas;
-      curso.dt_criacao.value = onEdit.dt_criacao;
-      curso.dt_desativacao.value = onEdit.dt_desativacao;
+      for (const key in onEdit) {
+        // Set this condition only if the form has possibly nullable fields
+        if (onEdit[key] !== null) {
+          formikRef.current.setFieldValue(key, onEdit[key]);
+        }
+      }
     }
   }, [onEdit]);
 
@@ -33,155 +57,167 @@ export default function FormCurso({
     setExibeTabela(true);
   };
 
-  const handleSubmit = async (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
+  const handleSubmit = async (values, actions) => {
+    const updatedCursos = cursos;
 
-    const curso = ref.current;
-
-    if (form.checkValidity()) {
-      if (onEdit) {
-        await axios
-          .put(urlBase + "/cursos/", {
-            codigo: curso.codigo.value,
-            nome: curso.nome.value,
-            sala: curso.sala.value,
-            eixo: curso.eixo.value,
-            carga_horas: curso.carga_horas.value,
-            dt_criacao: curso.dt_criacao.value,
-            dt_desativacao: curso.dt_desativacao.value,
-          })
-          .then(({ data }) => toast.info(data.mensagem))
-          .catch(({ data }) => toast.error(data.mensagem));
-      } else {
-        await axios
-          .post(urlBase + "/cursos/", {
-            codigo: curso.codigo.value,
-            nome: curso.nome.value,
-            sala: curso.sala.value,
-            eixo: curso.eixo.value,
-            carga_horas: curso.carga_horas.value,
-            dt_criacao: curso.dt_criacao.value,
-            dt_desativacao: curso.dt_desativacao.value,
-          })
-          .then(({ data }) => toast.info(data.mensagem))
-          .catch(({ data }) => toast.error(data.mensagem));
-      }
-
-      curso.codigo.value = "";
-      curso.nome.value = "";
-      curso.sala.value = "";
-      curso.eixo.value = "";
-      curso.carga_horas.value = "";
-      curso.dt_criacao.value = "";
-      curso.dt_desativacao.value = "";
-
-      getCursos();
+    if (onEdit) {
+      axios
+        .put(`${urlBase}/cursos/`, JSON.stringify(values), options)
+        .then((response) => {
+          const index = updatedCursos.findIndex(
+            (i) => i.codigo === onEdit.codigo
+          );
+          updatedCursos[index] = values;
+          setCursos(updatedCursos);
+          toast.success(response.data.message);
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     } else {
-      setValidated(true);
+      axios
+        .post(`${urlBase}/cursos/`, JSON.stringify(values), options)
+        .then((response) => {
+          formikRef.current.setFieldValue("codigo", response.data.id);
+          values.codigo = response.data.id;
+          updatedCursos.push(values);
+          setCursos(updatedCursos);
+          toast.success(response.data.message);
+        })
+        .catch(({response}) => {
+          toast.error(response.data.message);
+        });
     }
   };
 
   return (
     <div>
       <Cabecalho2 texto1={"Cadastro"} texto2={"Curso"} />
-      <Container className="mt-3">
-        <Form
-          method="POST"
-          action="#"
-          noValidate
-          validated={validated}
+      <Container
+        className="my-4 p-3 overflow-auto"
+        style={{ maxHeight: "75vh" }}
+      >
+        <Formik
+          innerRef={formikRef}
+          validationSchema={schema}
           onSubmit={handleSubmit}
-          ref={ref}
+          initialValues={initialValues}
+          enableReinitialize={true}
         >
-          <MenuFormulario acaoBtnVoltar={() => handleBackButton()} />
-          <Row className="mb-3">
-            <Col xs={6} sm={6} md={6} lg={6}>
-              <Form.Group>
-                <Form.Label>Código</Form.Label>
-                <Form.Control type="text" name="codigo" disabled />
-              </Form.Group>
-            </Col>
-            <Col></Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Nome</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome"
-                  placeholder="Digite o nome do curso"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Nome do curso é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Sala</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="sala"
-                  placeholder="Digite a sala do curso"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Sala do curso é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Eixo</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="eixo"
-                  placeholder="Digite o eixo formativo do curso"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Eixo formativo do curso é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Carga horária</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="carga_horas"
-                  placeholder="Digite a carga horária do curso"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Carga horária do curso é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Criado em</Form.Label>
-                <Form.Control type="date" name="dt_criacao" required />
-                <Form.Control.Feedback type="invalid">
-                  Data de criação é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Desativado em</Form.Label>
-                <Form.Control type="date" name="dt_desativacao" />
-              </Form.Group>
-            </Col>
-          </Row>
-        </Form>
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+            isValid,
+            isSubmitting,
+            dirty,
+          }) => (
+            <Form noValidate onSubmit={handleSubmit} ref={formRef}>
+              <Row>
+                <Col sm={2} md={2} lg={2} className="mb-3">
+                  <FormTextField
+                    controlId="formCurso.codigo"
+                    label="Código"
+                    name="codigo"
+                    value={values.codigo}
+                    isDisabled={true}
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formCurso.nome"
+                    label="Nome"
+                    name="nome"
+                    placeholder="Informe o nome do curso"
+                    value={values.nome}
+                    required
+                  />
+                </Col>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formCurso.sala"
+                    label="Sala"
+                    name="sala"
+                    placeholder="Informe a sala do curso"
+                    value={values.sala}
+                    required
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formCurso.eixo"
+                    label="Eixo"
+                    name="eixo"
+                    placeholder="Informe o eixo formativo do curso"
+                    value={values.eixo}
+                    required
+                  />
+                </Col>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formCurso.cargaHoras"
+                    label="Carga horária"
+                    name="cargaHoras"
+                    placeholder="Informe a carga horária do curso"
+                    value={values.cargaHoras}
+                    required
+                  />
+                </Col>
+              </Row>
+
+              <Row className="mb-3">
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formCurso.dataCriacao"
+                    label="Data Início"
+                    name="dataCriacao"
+                    type="date"
+                    value={values.dataCriacao}
+                    required
+                  />
+                </Col>
+
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formCurso.dataDesativacao"
+                    label="Data Fim"
+                    name="dataDesativacao"
+                    type="date"
+                    value={values.dataDesativacao}
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col className="d-flex">
+                  <Button
+                    disabled={isSubmitting}
+                    as="input"
+                    size="md"
+                    type="submit"
+                    value="Salvar"
+                    className="me-2"
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    as="input"
+                    size="md"
+                    type="button"
+                    value="Voltar"
+                    onClick={handleBackButton}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Formik>
       </Container>
     </div>
   );

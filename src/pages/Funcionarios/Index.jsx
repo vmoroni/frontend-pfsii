@@ -15,19 +15,24 @@ export default function TelaCadastroFuncionarios(props) {
   const getFuncionarios = async () => {
     try {
       const res = await axios.get(urlBase + "/funcionarios");
-      setFuncionarios(res.data);
-    } catch (error) {
-      toast.error(error);
+      if (Array.isArray(res.data)) {
+        setFuncionarios(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(
+        `Não foi possível obter funcionários: ${response.data.message}`
+      );
     }
   };
 
   const getCargos = async () => {
     try {
       const res = await axios.get(urlBase + "/cargos");
-      setCargos(res.data);
-    } catch (error) {
-      toast.error(error.message);
-      console.log(error);
+      if (Array.isArray(res.data)) {
+        setCargos(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(`Não foi possível obter cargos: ${response.data.message}`);
     }
   };
 
@@ -50,7 +55,8 @@ export default function TelaCadastroFuncionarios(props) {
       cargos={cargos}
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getFuncionarios={getFuncionarios}
+      funcionarios={funcionarios}
+      setFuncionarios={setFuncionarios}
       setExibeTabela={setExibeTabela}
     />
   );

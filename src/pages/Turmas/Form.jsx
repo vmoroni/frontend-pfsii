@@ -1,11 +1,47 @@
-import { Container, Col, Form, Row } from "react-bootstrap";
-import { useEffect, useRef, useState } from "react";
-import MenuFormulario from "../../components/MenuFormulario";
+import { Container, Col, Form, Row, Button } from "react-bootstrap";
+import { useState, useRef, useEffect } from "react";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { urlBase } from "../../utils/definicoes";
 import { toast } from "react-toastify";
 import axios from "axios";
 import SearchBar from "../../components/SearchBar/Index";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import FormTextField from "../../components/Form/form-field";
+import FormSelectField from "../../components/Form/form-select-field";
+
+const schema = Yup.object().shape({
+  periodo: Yup.string().required("Período é obrigatório"),
+  anoLetivo: Yup.number()
+    .required("Ano letivo é obrigatório")
+    .positive("Precisa ser um número positivo")
+    .min(
+      new Date().getFullYear(),
+      "O valor mínimo não pode ser menor do que o ano atual"
+    ),
+  curso: Yup.object().required("Curso é obrigatório"),
+  dataInicio: Yup.string().required("Data início é obrigatório"),
+  dataFim: Yup.string().required("Data fim é obrigatório"),
+  status: Yup.string().required("Status é obrigatório"),
+  vagas: Yup.number().required("Vagas é obrigatório"),
+  funcionario: Yup.object().required("Professor é obrigatório"),
+});
+
+const initialValues = {
+  codigo: "",
+  periodo: "",
+  anoLetivo: "",
+  curso: "",
+  dataInicio: "",
+  dataFim: "",
+  status: "",
+  vagas: "",
+  funcionario: "",
+};
+
+const options = {
+  headers: { "content-type": "application/json" },
+};
 
 export default function FormTurma({
   cursos,
@@ -13,25 +49,31 @@ export default function FormTurma({
   onEdit,
   setExibeTabela,
   setOnEdit,
-  getTurmas,
+  turmas,
+  setTurmas,
 }) {
-  const [validated, setValidated] = useState(false);
-  const [selectedCurso, setSelectedCurso] = useState({});
-  const [selectedProf, setSelectedProf] = useState({});
-  const ref = useRef();
+  const [selectedProf, setSelectedProf] = useState();
+  const [selectedCurso, setSelectedCurso] = useState();
+  const formRef = useRef();
+  const formikRef = useRef();
 
   useEffect(() => {
     if (onEdit) {
-      const turma = ref.current;
-      turma.codigo.value = onEdit.codigo;
-      turma.periodo.value = onEdit.periodo;
-      turma.ano_letivo.value = onEdit.ano_letivo;
-      turma.dt_inicio.value = onEdit.dt_inicio;
-      turma.dt_fim.value = onEdit.dt_fim;
-      turma.status.value = onEdit.status;
-      turma.vagas.value = onEdit.vagas;
-      // turma.funcionario.value = onEdit.Funcionario_codigo;
-      // turma.curso.value = onEdit.Curso_codigo;
+      for (const key in onEdit) {
+        // Set this condition only if the form has possibly nullable fields
+        if (onEdit[key] !== null) {
+          formikRef.current.setFieldValue(key, onEdit[key]);
+        }
+      }
+
+      setSelectedCurso({
+        codigo: onEdit.curso.codigo,
+        nome: onEdit.curso.nome,
+      });
+      setSelectedProf({
+        codigo: onEdit.funcionario.codigo,
+        nome: onEdit.funcionario.nome,
+      });
     }
   }, [onEdit]);
 
@@ -40,210 +82,213 @@ export default function FormTurma({
     setExibeTabela(true);
   };
 
-  const handleSubmit = async (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
+  const handleSubmit = async (values, actions) => {
+    const updatedTurmas = turmas;
 
-    const turma = ref.current;
-
-    if (form.checkValidity()) {
-      if (onEdit) {
-        await axios
-          .put(urlBase + "/turmas/", {
-            codigo: turma.codigo.value,
-            periodo: turma.periodo.value,
-            ano_letivo: turma.ano_letivo.value,
-            dt_inicio: turma.dt_inicio.value,
-            dt_fim: turma.dt_fim.value,
-            status: turma.status.value,
-            vagas: turma.vagas.value,
-            funcionario: turma.funcionario.value,
-            curso: turma.curso.value,
-          })
-          .then(({ data }) => toast.info(data.mensagem))
-          .catch(({ response }) => toast.error(response.data.mensagem));
-      } else {
-        await axios
-          .post(urlBase + "/turmas/", {
-            codigo: turma.codigo.value,
-            periodo: turma.periodo.value,
-            ano_letivo: turma.ano_letivo.value,
-            dt_inicio: turma.dt_inicio.value,
-            dt_fim: turma.dt_fim.value,
-            status: turma.status.value,
-            vagas: turma.vagas.value,
-            funcionario: turma.funcionario.value,
-            curso: turma.curso.value,
-          })
-          .then(({ data }) => toast.info(data.mensagem))
-          .catch(({ response }) => toast.error(response.data.mensagem));
-      }
-
-      turma.codigo.value = "";
-      turma.periodo.value = "";
-      turma.ano_letivo.value = "";
-      turma.dt_inicio.value = "";
-      turma.dt_fim.value = "";
-      turma.status.value = "";
-      turma.vagas.value = "";
-      turma.funcionario.value = "";
-      turma.curso.value = "";
-
-      getTurmas();
+    if (onEdit) {
+      axios
+        .put(`${urlBase}/turmas/`, JSON.stringify(values), options)
+        .then((response) => {
+          const index = updatedTurmas.findIndex(
+            (i) => i.codigo === onEdit.codigo
+          );
+          updatedTurmas[index] = values;
+          setTurmas(updatedTurmas);
+          toast.success(response.data.message);
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     } else {
-      setValidated(true);
+      axios
+        .post(`${urlBase}/turmas/`, JSON.stringify(values), options)
+        .then((response) => {
+          formikRef.current.setFieldValue("codigo", response.data.id);
+          values.codigo = response.data.id;
+          updatedTurmas.push(values);
+          setTurmas(updatedTurmas);
+          toast.success(response.data.message);
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     }
   };
 
   return (
     <div>
       <Cabecalho2 texto1={"Cadastro"} texto2={"Turma"} />
-      <Container className="mt-3">
-        <Form
-          method="POST"
-          action="#"
-          noValidate
-          validated={validated}
+      <Container
+        className="my-4 p-3 overflow-auto"
+        style={{ maxHeight: "75vh" }}
+      >
+        <Formik
+          innerRef={formikRef}
+          validationSchema={schema}
           onSubmit={handleSubmit}
-          ref={ref}
+          initialValues={initialValues}
+          enableReinitialize={true}
         >
-          <MenuFormulario acaoBtnVoltar={() => handleBackButton()} />
-          <Row className="my-3">
-            <Col xs={6} sm={6} md={6} lg={6}>
-              <Form.Group>
-                <Form.Label>Código</Form.Label>
-                <Form.Control type="text" name="codigo" disabled />
-              </Form.Group>
-            </Col>
-          </Row>
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+            isValid,
+            isSubmitting,
+            dirty,
+          }) => (
+            <Form noValidate onSubmit={handleSubmit} ref={formRef}>
+              <Row>
+                <Col sm={2} md={2} lg={2} className="mb-3">
+                  <FormTextField
+                    controlId="formTurma.codigo"
+                    label="Código"
+                    name="codigo"
+                    value={values.codigo}
+                    isDisabled={true}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="mb-3">
+                  <FormSelectField
+                    controlId="formTurma.periodo"
+                    label="Período"
+                    name="periodo"
+                    className="mb-3"
+                    value={values.periodo}
+                    required
+                  >
+                    <option value="">Selecione um período</option>
+                    <option value="Matutino">Matutino</option>
+                    <option value="Vespertino">Vespertino</option>
+                    <option value="Noturno">Noturno</option>
+                  </FormSelectField>
+                </Col>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Período</Form.Label>
-                <Form.Select name="periodo" required>
-                  <option value="">Selecione</option>
-                  <option value="Matutino">Matutino</option>
-                  <option value="Vespertino">Vespertino</option>
-                  <option value="Noturno">Noturno</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  Período da turma é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Ano Letivo</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="ano_letivo"
-                  placeholder="Digite o ano letivo"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Ano letivo é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Curso</Form.Label>
-                <Form.Select name="curso" required>
-                  <option value="">Selecione</option>
-                  {cursos.map((curso, i) => {
-                    return (
-                      <option value={curso.codigo} key={i}>
-                        {curso.nome}
-                      </option>
-                    );
-                  })}
-                </Form.Select>
-                {/* <SearchBar
-                  placeholder="Informe o curso"
-                  data={cursos}
-                  keyField="codigo"
-                  searchField="nome"
-                  select={setSelectedCurso}
-                  // value=""
-                  name="curso"
-                  controlId="formCurso"
-                /> */}
-                <Form.Control.Feedback type="invalid">
-                  Escolha do curso é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Data Início</Form.Label>
-                <Form.Control type="date" name="dt_inicio" required />
-                <Form.Control.Feedback type="invalid">
-                  Data de início é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Data Fim</Form.Label>
-                <Form.Control type="date" name="dt_fim" />
-              </Form.Group>
-            </Col>
-          </Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formTurma.anoLetivo"
+                    label="Ano letivo"
+                    name="anoLetivo"
+                    type="number"
+                    placeholder="Informe o ano letivo"
+                    value={values.anoLetivo}
+                    required
+                  />
+                </Col>
+              </Row>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Status</Form.Label>
-                <Form.Select name="status" required>
-                  <option value="">Selecione</option>
-                  <option value="Ativo">Ativo</option>
-                  <option value="Inativo">Inativo</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  Status atual da turma é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Vagas</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="vagas"
-                  placeholder="Digite a quantidade de vagas para turma"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Quantidade de vagas é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Professor</Form.Label>
-                <SearchBar
-                  placeholder="Informe o professor"
-                  data={funcionarios}
-                  keyField="codigo_funcionario"
-                  searchField="nome"
-                  select={setSelectedProf}
-                  // value=""
-                  name="Funcionario_codigo"
-                />
-                <Form.Control.Feedback type="invalid">
-                  Professor da turma é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-        </Form>
+              <Row>
+                <Col className="mb-3">
+                  <SearchBar
+                    controlId="formTurma.curso"
+                    label="Curso"
+                    name="curso"
+                    placeholder="Informe o curso"
+                    data={cursos}
+                    keyField="codigo"
+                    searchField="nome"
+                    select={setSelectedCurso}
+                    selected={selectedCurso}
+                    value={values.curso}
+                    required
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formTurma.dataInicio"
+                    label="Data Início"
+                    name="dataInicio"
+                    type="date"
+                    value={values.dataInicio}
+                    required
+                  />
+                </Col>
+
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formTurma.dataFim"
+                    label="Data Fim"
+                    name="dataFim"
+                    type="date"
+                    value={values.dataFim}
+                    required
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormSelectField
+                    controlId="formTurma.status"
+                    label="Status"
+                    name="status"
+                    className="mb-3"
+                    value={values.status}
+                    required
+                  >
+                    <option value="">Selecione o status do curso</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Inativo">Inativo</option>
+                  </FormSelectField>
+                </Col>
+
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formTurma.vagas"
+                    label="Vagas"
+                    name="vagas"
+                    placeholder="Informe a quantidade de vagas"
+                    value={values.vagas}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="mb-3">
+                  <SearchBar
+                    controlId="formTurma.funcionario"
+                    label="Professor"
+                    name="funcionario"
+                    placeholder="Informe o professor"
+                    data={funcionarios}
+                    keyField="codigo"
+                    searchField="nome"
+                    select={setSelectedProf}
+                    selected={selectedProf}
+                    value={values.funcionario}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex">
+                  <Button
+                    disabled={isSubmitting}
+                    as="input"
+                    size="md"
+                    type="submit"
+                    value="Salvar"
+                    className="me-2"
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    as="input"
+                    size="md"
+                    type="button"
+                    value="Voltar"
+                    onClick={handleBackButton}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Formik>
       </Container>
     </div>
   );

@@ -26,13 +26,13 @@ export default function TabelaCadastroTurmas({
   const handleDelete = async (codigo) => {
     await axios
       .delete(`${urlBase}/turmas/${codigo}`)
-      .then(({ data }) => {
+      .then((response) => {
         const newArray = turmas.filter((turma) => turma.codigo !== codigo);
 
         setTurmas(newArray);
-        toast.info(data.mensagem);
+        toast.success(response.data.message);
       })
-      .catch(({ response }) => toast.error(response.data.mensagem));
+      .catch(({ response }) => toast.error(response.data.message));
 
     setOnEdit(null);
   };
@@ -43,7 +43,7 @@ export default function TabelaCadastroTurmas({
   };
 
   turmas.forEach((turma, i) => {
-    if (turma.ano_letivo.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
+    if (turma.curso.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
       return;
     }
     linhas.push(
@@ -66,7 +66,7 @@ export default function TabelaCadastroTurmas({
             <Form.Control
               type="text"
               value={filtro}
-              placeholder="Ano letivo..."
+              placeholder="Curso..."
               onChange={(e) => aoMudarFiltro(e.target.value)}
               style={{ width: "300px" }}
             />
@@ -98,10 +98,10 @@ function LinhaTurma({ turma, handleEdit, handleConfirm }) {
     <tr>
       <td>{turma.codigo}</td>
       <td>{turma.periodo}</td>
-      <td>{turma.ano_letivo}</td>
-      <td>{turma.curso_nome}</td>
-      <td>{turma.funcionario_nome}</td>
-      {/* <td>{turma.dt_inicio}</td>
+      <td>{turma.anoLetivo}</td>
+      <td>{turma.curso.nome}</td>
+      <td>{turma.funcionario.nome}</td>
+      {/* <td>{turma.dataInicio}</td>
       <td>{turma.status}</td>
       <td>{turma.vagas}</td> */}
       <td>

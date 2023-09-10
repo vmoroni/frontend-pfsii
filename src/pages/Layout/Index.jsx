@@ -6,15 +6,16 @@ import Alunos from "../Alunos/Index";
 import Turmas from "../Turmas/Index";
 import Cabecalho1 from "../../components/Cabecalho1";
 import Home from "../HomePage/Index";
+import Pagina404 from "../404/Index";
 
 // PÁGINAS
 
 function PageAlunos(props) {
   return (
-    <div style={{ height: "100vh" }}>
+    <>
       <Cabecalho1 />
       <Alunos />
-    </div>
+    </>
   );
 }
 
@@ -74,6 +75,15 @@ function HomePage(props) {
   );
 }
 
+function Page404(props) {
+  return (
+    <>
+      {/* < Cabecalho1 /> */}
+      <Pagina404 />
+    </>
+  );
+}
+
 export {
   PageAlunos,
   PageCargos,
@@ -82,4 +92,5 @@ export {
   PageFuncionarios,
   HomePage,
   PageTurmas,
+  Page404,
 };

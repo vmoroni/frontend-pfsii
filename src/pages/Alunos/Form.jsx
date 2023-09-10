@@ -1,450 +1,402 @@
-import { Container, Col, Form, Row } from "react-bootstrap";
-import { useEffect, useRef, useState } from "react";
-import MenuFormulario from "../../components/MenuFormulario";
+import { Container, Col, Form, Row, Button } from "react-bootstrap";
+import { useRef, useEffect } from "react";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { urlBase } from "../../utils/definicoes";
+import { toast } from "react-toastify";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import { rg, cpf, cep, telefone } from "../../utils/masks";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import FormTextField from "../../components/Form/form-field";
+import FormSelectField from "../../components/Form/form-select-field";
+import { emailRegex } from "../../utils/expressions";
+import MaskedFormTextField from "../../components/Form/masked-form-field";
+
+const schema = Yup.object().shape({
+  rg: Yup.string().required("RG é obrigatório"),
+  cpf: Yup.string().required("CPF é obrigatório"),
+  nomeMae: Yup.string().required("Nome da mãe é obrigatório"),
+  dataNascimento: Yup.string().required("Data de nascimento é obrigatório"),
+  escola: Yup.string().required("Escola é obrigatório"),
+  serie: Yup.string().required("Série é obrigatório"),
+  periodo: Yup.string().required("Período é obrigatório"),
+  nome: Yup.string().required("Nome é obrigatório"),
+  telefone: Yup.string().required("Telefone é obrigatório"),
+  email: Yup.string()
+    .required("E-mail é obrigatório")
+    .matches(emailRegex, "Endereço de email inválido"),
+  endereco: Yup.string().required("Endereço é obrigatório"),
+  bairro: Yup.string().required("Bairro é obrigatório"),
+  cidade: Yup.string().required("Cidade é obrigatório"),
+  cep: Yup.string().required("CEP é obrigatório"),
+  uf: Yup.string().required("UF é obrigatório"),
+});
+
+const initialValues = {
+  codigo: "",
+  rg: "",
+  cpf: "",
+  nomeMae: "",
+  dataNascimento: "",
+  escola: "",
+  serie: "",
+  periodo: "",
+  nome: "",
+  telefone: "",
+  email: "",
+  endereco: "",
+  bairro: "",
+  cidade: "",
+  cep: "",
+  uf: "",
+};
+
+const options = {
+  headers: { "content-type": "application/json" },
+};
 
 export default function FormAluno({
   onEdit,
   setExibeTabela,
   setOnEdit,
-  getAlunos,
+  alunos,
+  setAlunos,
 }) {
-  const [validated, setValidated] = useState(false);
-  const ref = useRef();
+  const formRef = useRef();
+  const formikRef = useRef();
 
   useEffect(() => {
     if (onEdit) {
-      const aluno = ref.current;
-      aluno.codigo.value = onEdit.codigo;
-      aluno.rg.value = onEdit.rg;
-      aluno.cpf.value = onEdit.cpf;
-      aluno.nome_mae.value = onEdit.nome_mae;
-      aluno.dt_nasc.value = onEdit.dt_nasc;
-      aluno.escola.value = onEdit.escola;
-      aluno.serie.value = onEdit.serie;
-      aluno.periodo.value = onEdit.periodo;
-      aluno.nome.value = onEdit.nome;
-      aluno.telefone.value = onEdit.telefone;
-      aluno.email.value = onEdit.email;
-      aluno.endereco.value = onEdit.endereco;
-      aluno.bairro.value = onEdit.bairro;
-      aluno.cidade.value = onEdit.cidade;
-      aluno.cep.value = onEdit.cep;
-      aluno.uf.value = onEdit.uf;
+      for (const key in onEdit) {
+        // Set this condition only if the form has possibly nullable fields
+        if (onEdit[key] !== null) {
+          formikRef.current.setFieldValue(key, onEdit[key]);
+        }
+      }
     }
   }, [onEdit]);
-
-  const handleRgMask = (e) => {
-    rg(e);
-  };
-
-  const handleCpfMask = (e) => {
-    cpf(e);
-  };
-
-  const handleCepMask = (e) => {
-    cep(e);
-  };
-
-  const handleTelMask = (e) => {
-    telefone(e);
-  };
-
-  const clearForm = (aluno) => {
-    aluno.codigo.value = "";
-    aluno.rg.value = "";
-    aluno.cpf.value = "";
-    aluno.nome_mae.value = "";
-    aluno.dt_nasc.value = "";
-    aluno.escola.value = "";
-    aluno.serie.value = "";
-    aluno.periodo.value = "";
-    aluno.nome.value = "";
-    aluno.telefone.value = "";
-    aluno.email.value = "";
-    aluno.endereco.value = "";
-    aluno.bairro.value = "";
-    aluno.cidade.value = "";
-    aluno.cep.value = "";
-    aluno.uf.value = "";
-  };
 
   const handleBackButton = () => {
     if (onEdit) setOnEdit(null);
     setExibeTabela(true);
   };
 
-  const handleSubmit = async (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
+  const handleSubmit = async (values, actions) => {
+    const updatedAlunos = alunos;
 
-    const aluno = ref.current;
-
-    if (form.checkValidity()) {
-      if (onEdit) {
-        await axios
-          .put(`${urlBase}/alunos/`, {
-            codigo: aluno.codigo.value,
-            rg: aluno.rg.value,
-            cpf: aluno.cpf.value,
-            nome_mae: aluno.nome_mae.value,
-            dt_nasc: aluno.dt_nasc.value,
-            escola: aluno.escola.value,
-            serie: aluno.serie.value,
-            periodo: aluno.periodo.value,
-            nome: aluno.nome.value,
-            telefone: aluno.telefone.value,
-            email: aluno.email.value,
-            endereco: aluno.endereco.value,
-            bairro: aluno.bairro.value,
-            cidade: aluno.cidade.value,
-            cep: aluno.cep.value,
-            uf: aluno.uf.value,
-          })
-          .then(({ data }) => {
-            toast.info(data.mensagem);
-            clearForm(aluno);
-          })
-          .catch(({ response }) => {
-            toast.error(response.data.mensagem);
-          });
-      } else {
-        await axios
-          .post(`${urlBase}/alunos/`, {
-            rg: aluno.rg.value,
-            cpf: aluno.cpf.value,
-            nome_mae: aluno.nome_mae.value,
-            dt_nasc: aluno.dt_nasc.value,
-            escola: aluno.escola.value,
-            serie: aluno.serie.value,
-            periodo: aluno.periodo.value,
-            nome: aluno.nome.value,
-            telefone: aluno.telefone.value,
-            email: aluno.email.value,
-            endereco: aluno.endereco.value,
-            bairro: aluno.bairro.value,
-            cidade: aluno.cidade.value,
-            cep: aluno.cep.value,
-            uf: aluno.uf.value,
-          })
-          .then(({ data }) => {
-            toast.info(data.mensagem);
-            clearForm(aluno);
-          })
-          .catch(({ response }) => {
-            toast.error(response.data.mensagem);
-          });
-      }
-
-      getAlunos();
-
-      if (validated) {
-        setValidated(false);
-      }
+    if (onEdit) {
+      axios
+        .put(`${urlBase}/alunos/`, JSON.stringify(values), options)
+        .then((response) => {
+          // Get index of item on edition
+          const index = updatedAlunos.findIndex(
+            (i) => i.codigo === onEdit.codigo
+          );
+          // Replace old values
+          updatedAlunos[index] = values;
+          // Set new list
+          setAlunos(updatedAlunos);
+          toast.success(response.data.message);
+        })
+        .catch((err) => {
+          toast.error(err.response.data.message);
+        });
     } else {
-      setValidated(true);
+      axios
+        .post(`${urlBase}/alunos/`, JSON.stringify(values), options)
+        .then((response) => {
+          formikRef.current.setFieldValue("codigo", response.data.id);
+          values.codigo = response.data.id;
+          updatedAlunos.push(values);
+          setAlunos(updatedAlunos);
+          toast.success(response.data.message);
+          // After pushing new item to list, it goes to the end of it
+          // It must be treated on list
+        })
+        .catch(({ response }) => {
+          toast.error(response.data.message);
+        });
     }
   };
 
   return (
     <div>
       <Cabecalho2 texto1={"Cadastro"} texto2={"Aluno"} />
-      <Container className="mt-3">
-        <Form
-          method="POST"
-          action="#"
-          noValidate
-          validated={validated}
+      <Container
+        className="my-4 p-3 overflow-auto"
+        style={{ maxHeight: "75vh" }}
+      >
+        <Formik
+          innerRef={formikRef}
+          validationSchema={schema}
           onSubmit={handleSubmit}
-          ref={ref}
+          initialValues={initialValues}
+          enableReinitialize={true}
         >
-          <MenuFormulario acaoBtnVoltar={() => handleBackButton()} />
-          <Row>
-            <Col sm={6} md={6} lg={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Código</Form.Label>
-                <Form.Control type="text" name="codigo" disabled />
-              </Form.Group>
-            </Col>
-          </Row>
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+            isValid,
+            isSubmitting,
+            dirty,
+          }) => (
+            <Form noValidate onSubmit={handleSubmit} ref={formRef}>
+              <Row>
+                <Col sm={2} md={2} lg={2} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.codigo"
+                    label="Código"
+                    name="codigo"
+                    value={values.codigo}
+                    isDisabled={true}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.nome"
+                    label="Nome"
+                    name="nome"
+                    placeholder="Informe o nome do aluno"
+                    value={values.nome}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.nomeMae"
+                    label="Nome da Mãe"
+                    name="nomeMae"
+                    placeholder="Informe o nome da mãe do aluno"
+                    value={values.nomeMae}
+                    required
+                  />
+                </Col>
 
-          <Row>
-            <Col className="mb-3">
-              <Form.Group>
-                <Form.Label>Nome do aluno</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome"
-                  // placeholder="Digite o nome do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Nome do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.dataNascimento"
+                    label="Data de Nascimento"
+                    name="dataNascimento"
+                    type="date"
+                    value={values.dataNascimento}
+                    required
+                  />
+                </Col>
+              </Row>
 
-          <Row>
-            <Col className="mb-3">
-              <Form.Group>
-                <Form.Label>Nome da Mãe</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome_mae"
-                  // placeholder="Digite o nome da mãe"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Nome da mãe é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formAluno.rg"
+                    label="RG"
+                    name="rg"
+                    format="##.###.###-#"
+                    mask="_"
+                    placeholder="Informe o RG do aluno"
+                    value={values.rg}
+                    required
+                  />
+                </Col>
 
-          <Row>
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>RG</Form.Label>
-                <Form.Control
-                  onKeyUp={handleRgMask}
-                  type="text"
-                  name="rg"
-                  // placeholder="Digite o RG do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  RG do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formAluno.cpf"
+                    label="CPF"
+                    name="cpf"
+                    format="###.###.###-##"
+                    mask="_"
+                    placeholder="Informe o CPF do aluno"
+                    value={values.cpf}
+                    required
+                  />
+                </Col>
+              </Row>
 
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>CPF</Form.Label>
-                <Form.Control
-                  onKeyUp={handleCpfMask}
-                  type="text"
-                  name="cpf"
-                  // placeholder="Digite o CPF do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  CPF do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.endereco"
+                    label="Endereço"
+                    name="endereco"
+                    placeholder="Informe o endereço do aluno"
+                    value={values.endereco}
+                    required
+                  />
+                </Col>
 
-          <Row>
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Data de Nascimento</Form.Label>
-                <Form.Control type="date" name="dt_nasc" required />
-                <Form.Control.Feedback type="invalid">
-                  Data de nascimento do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.bairro"
+                    label="Bairro"
+                    name="bairro"
+                    placeholder="Informe o bairro do aluno"
+                    value={values.bairro}
+                    required
+                  />
+                </Col>
+              </Row>
 
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Endereço</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="endereco"
-                  // placeholder="Digite o endereço"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Endereço do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.cidade"
+                    label="Cidade"
+                    name="cidade"
+                    placeholder="Informe o cidade do aluno"
+                    value={values.cidade}
+                    required
+                  />
+                </Col>
 
-          <Row>
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Bairro</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="bairro"
-                  // placeholder="Digite o bairro"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Bairro do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+                <Col md={6} className="mb-3">
+                  <FormSelectField
+                    controlId="formAluno.uf"
+                    label="UF"
+                    name="uf"
+                    value={values.uf}
+                    required
+                  >
+                    <option value="">Selecione</option>
+                    <option value="AC">Acre</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option>
+                    <option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option>
+                    <option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option>
+                    <option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option>
+                    <option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option>
+                    <option value="MS">Mato Grosso do Sul</option>
+                    <option value="MG">Minas Gerais</option>
+                    <option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option>
+                    <option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
+                    <option value="EX">Estrangeiro</option>
+                  </FormSelectField>
+                </Col>
+              </Row>
 
-            <Col className="mb-3">
-              <Form.Group>
-                <Form.Label>Cidade</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="cidade"
-                  // placeholder="Digite a cidade"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Cidade do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formAluno.cep"
+                    label="CEP"
+                    name="cep"
+                    format="#####-###"
+                    mask="_"
+                    placeholder="Informe a CEP do aluno"
+                    value={values.cep}
+                    required
+                  />
+                </Col>
 
-          <Row>
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>UF</Form.Label>
-                <Form.Select name="uf" required>
-                  <option value="">Selecione</option>
-                  <option value="AC">Acre</option>
-                  <option value="AL">Alagoas</option>
-                  <option value="AP">Amapá</option>
-                  <option value="AM">Amazonas</option>
-                  <option value="BA">Bahia</option>
-                  <option value="CE">Ceará</option>
-                  <option value="DF">Distrito Federal</option>
-                  <option value="ES">Espírito Santo</option>
-                  <option value="GO">Goiás</option>
-                  <option value="MA">Maranhão</option>
-                  <option value="MT">Mato Grosso</option>
-                  <option value="MS">Mato Grosso do Sul</option>
-                  <option value="MG">Minas Gerais</option>
-                  <option value="PA">Pará</option>
-                  <option value="PB">Paraíba</option>
-                  <option value="PR">Paraná</option>
-                  <option value="PE">Pernambuco</option>
-                  <option value="PI">Piauí</option>
-                  <option value="RJ">Rio de Janeiro</option>
-                  <option value="RN">Rio Grande do Norte</option>
-                  <option value="RS">Rio Grande do Sul</option>
-                  <option value="RO">Rondônia</option>
-                  <option value="RR">Roraima</option>
-                  <option value="SC">Santa Catarina</option>
-                  <option value="SP">São Paulo</option>
-                  <option value="SE">Sergipe</option>
-                  <option value="TO">Tocantins</option>
-                  <option value="EX">Estrangeiro</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  UF é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+                <Col md={6} className="mb-3">
+                  <MaskedFormTextField
+                    controlId="formAluno.telefone"
+                    label="Telefone"
+                    name="telefone"
+                    format="(##) #####-####"
+                    mask="_"
+                    placeholder="Informe o telefone do aluno"
+                    value={values.telefone}
+                    required
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.email"
+                    label="E-mail"
+                    name="email"
+                    placeholder="Informe o e-mail do aluno"
+                    value={values.email}
+                    required
+                  />
+                </Col>
 
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>CEP</Form.Label>
-                <Form.Control
-                  onKeyUp={handleCepMask}
-                  type="text"
-                  name="cep"
-                  // placeholder="Digite o CEP do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  CEP do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.escola"
+                    label="Escola"
+                    name="escola"
+                    placeholder="Informe a escola do aluno"
+                    value={values.escola}
+                    required
+                  />
+                </Col>
+              </Row>
 
-          <Row>
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Telefone/Celular</Form.Label>
-                <Form.Control
-                  onKeyUp={handleTelMask}
-                  type="text"
-                  name="telefone"
-                  // placeholder="Digite o telefone/celular do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Telefone do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+              <Row>
+                <Col md={6} className="mb-3">
+                  <FormTextField
+                    controlId="formAluno.serie"
+                    label="Série"
+                    name="serie"
+                    placeholder="Informe a série do aluno"
+                    value={values.serie}
+                    required
+                  />
+                </Col>
 
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>E-mail</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  // placeholder="Digite o email do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  E-mail do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col className="mb-3">
-              <Form.Group>
-                <Form.Label>Escola</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="escola"
-                  // placeholder="Digite a escola do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Escola do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Serie</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="serie"
-                  // placeholder="Digite a série escolar do aluno"
-                  required
-                />
-                <Form.Control.Feedback type="invalid">
-                  Serie escolar do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Período</Form.Label>
-                <Form.Select name="periodo" required>
-                  <option value="">Selecione</option>
-                  <option value="Matutino">Matutino</option>
-                  <option value="Vespertino">Vespertino</option>
-                  <option value="Noturno">Noturno</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  Período escolar do aluno é obrigatório!
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-        </Form>
+                <Col md={6} className="mb-3">
+                  <FormSelectField
+                    controlId="formAluno.periodo"
+                    label="Período"
+                    name="periodo"
+                    className="mb-3"
+                    value={values.periodo}
+                    required
+                  >
+                    <option value="">Selecione um período</option>
+                    <option value="Matutino">Matutino</option>
+                    <option value="Vespertino">Vespertino</option>
+                    <option value="Noturno">Noturno</option>
+                  </FormSelectField>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex">
+                  <Button
+                    disabled={isSubmitting}
+                    as="input"
+                    size="md"
+                    type="submit"
+                    value="Salvar"
+                    className="me-2"
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    as="input"
+                    size="md"
+                    type="button"
+                    value="Voltar"
+                    onClick={handleBackButton}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Formik>
       </Container>
-      <ToastContainer
-        autoClose={3000}
-        position={toast.POSITION.BOTTOM_LEFT}
-        theme="colored"
-      />
     </div>
   );
 }

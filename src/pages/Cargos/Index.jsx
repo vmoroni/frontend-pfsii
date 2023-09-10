@@ -14,9 +14,11 @@ export default function TelaCadastroCargos(props) {
   const getCargos = async () => {
     try {
       const res = await axios.get(urlBase + "/cargos");
-      setCargos(res.data);
-    } catch (error) {
-      toast.error(error);
+      if (Array.isArray(res.data)) {
+        setCargos(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(`Não foi possível obter cargos: ${response.data.message}`);
     }
   };
 
@@ -37,7 +39,8 @@ export default function TelaCadastroCargos(props) {
     <Form
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getCargos={getCargos}
+      cargos={cargos}
+      setCargos={setCargos}
       setExibeTabela={setExibeTabela}
     />
   );

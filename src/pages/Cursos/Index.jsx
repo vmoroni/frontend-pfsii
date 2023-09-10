@@ -14,9 +14,11 @@ export default function TelaCadastroCursos(props) {
   const getCursos = async () => {
     try {
       const res = await axios.get(urlBase + "/cursos");
-      setCursos(res.data);
-    } catch (error) {
-      toast.error(error.message);
+      if (Array.isArray(res.data)) {
+        setCursos(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(`Não foi possível obter cursos: ${response.data.message}`);
     }
   };
 
@@ -37,7 +39,8 @@ export default function TelaCadastroCursos(props) {
     <Form
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getCursos={getCursos}
+      cursos={cursos}
+      setCursos={setCursos}
       setExibeTabela={setExibeTabela}
     />
   );

@@ -14,9 +14,11 @@ export default function TelaCadastroAlunos(props) {
   const getAlunos = async () => {
     try {
       const res = await axios.get(urlBase + "/alunos");
-      setAlunos(res.data);
-    } catch (error) {
-      toast.error(error);
+      if (Array.isArray(res.data)) {
+        setAlunos(res.data);
+      }
+    } catch ({ response }) {
+      toast.error(`Não foi possível obter alunos: ${response.data.message}`);
     }
   };
 
@@ -37,7 +39,8 @@ export default function TelaCadastroAlunos(props) {
     <Form
       onEdit={onEdit}
       setOnEdit={setOnEdit}
-      getAlunos={getAlunos}
+      alunos={alunos}
+      setAlunos={setAlunos}
       setExibeTabela={setExibeTabela}
     />
   );

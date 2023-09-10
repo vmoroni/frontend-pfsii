@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Form } from "react-bootstrap";
 import { BiSearch } from "react-icons/bi";
 import { GrFormClose } from "react-icons/gr";
 import "./searchbar.css";
+import { Field } from "formik";
+import { Form } from "react-bootstrap";
 
 const SearchBar = ({
+  controlId,
+  type,
+  label,
   placeholder,
   data,
   keyField,
@@ -12,109 +16,123 @@ const SearchBar = ({
   select,
   value,
   name,
+  required,
+  selected,
 }) => {
-  const searchInput = useRef();
   const [search, setSearch] = useState(value ? value : "");
   const [list, setList] = useState(data);
-  const [selectedItem, setSelectedItem] = useState(false);
+  const [show, setShow] = useState(false);
+  const listRef = useRef();
 
-  const filterResult = () => {
-    setList(
-      data.filter((item) => {
-        return search.length >= 1
-          ? item[searchField].toLowerCase().includes(search.toLowerCase())
-          : false;
-      })
-    );
-  };
-
-  const handleClick = () => {
-    if (search.length === 0) {
-      setList(data);
-      let result = document.querySelector(".data-result");
-      result.style.display = "block";
-    }
-  };
-
-  const handleListClick = (item) => {
-    setSearch(item[searchField]);
-    setSelectedItem(true);
-    select(item);
-  };
-
-  const handleChange = (e) => {
-    const element = e.target;
-    setSearch(element.value);
-    if (!selectedItem) {
-      element.setAttribute("aria-invalid", true);
-      element.setCustomValidity("error");
+  // Sempre que alterar o estado show
+  // a lista será visível ou oculta
+  useEffect(() => {
+    if (!selected && (show || search.length > 0) && list.length > 0) {
+      listRef.current.style.display = "block";
     } else {
-      element.removeAttribute("aria-invalid");
-      element.setCustomValidity("");
+      listRef.current.style.display = "none";
     }
-  };
+  }, [show, search, list, selected]);
 
-  const handleClose = (e) => {
-    setSearch("");
-    setSelectedItem(false);
-    select({});
-    searchInput.current.setAttribute("aria-invalid", true);
-    searchInput.current.setCustomValidity("error");
-    let result = document.querySelector(".data-result");
-    result.style.display = "none";
-  };
-
+  // Sempre que o valor da pesquisa for alterado
+  // A lista será filtrada
   useEffect(() => {
-    filterResult();
-    // eslint-disable-next-line
-  }, [search]);
-
-  useEffect(() => {
-    let result = document.querySelector(".data-result");
-    if (list.length > 0 && !selectedItem) {
-      result.style.display = "block";
+    if (data.length >= 1) {
+      setList(
+        data.filter((item) => {
+          return item[searchField].toLowerCase().includes(search.toLowerCase());
+        })
+      );
     } else {
-      result.style.display = "none";
+      setList([{ codigo: 0, nome: "Nenhum item encontrado" }]);
     }
-    // eslint-disable-next-line
-  }, [list]);
-
-  // eslint-disable-next-line
-  useEffect(() => {
-    searchInput.current.setCustomValidity("");
-    let result = document.querySelector(".data-result");
-    result.style.display = "none";
-  }, [selectedItem]);
+  }, [data, searchField, search]);
 
   return (
-    <div className="searchbar">
-      <div className="bar">
-        <BiSearch className="bar-icon" size={20} />
-        <Form.Control
-          type="text"
-          ref={searchInput}
-          placeholder={placeholder}
-          value={search}
-          name={name}
-          onChange={handleChange}
-          onClick={handleClick}
-          required
-        />
-        <GrFormClose className="bar-icon" size={25} onClick={handleClose} />
-      </div>
-      <div className="result">
-        <ul className="data-result">
-          {list.map((item) => {
-            return (
-              <li key={item[keyField]} onClick={(e) => handleListClick(item)}>
-                {item[keyField] + " - " + item[searchField]}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </div>
+    <Field name={name}>
+      {({ field, form, meta }) => {
+        const isValid = !form.errors[field.name];
+        const isInvalid = form.touched[field.name] && !isValid;
+        return (
+          <div style={{ position: "relative" }}>
+            <BiSearch className="search-icon" size={20} />
+
+            {selected && (
+              <div className="selectedItem">
+                <span></span>
+                <GrFormClose
+                  className="close-icon"
+                  size={20}
+                  onClick={() => {
+                    select();
+                    form.setFieldValue(name, "");
+                  }}
+                  title="Remover"
+                />
+                {`${selected[keyField]} - ${selected[searchField]}`}
+              </div>
+            )}
+
+            <Form.Group controlId={controlId} className="searchbar">
+              <Form.Label>
+                {label}
+                {required && <span style={{ color: "red" }}>*</span>}
+              </Form.Label>
+
+              <Form.Control
+                {...field}
+                type={type}
+                value={search}
+                placeholder={placeholder}
+                isValid={form.touched[field.name] && isValid}
+                isInvalid={isInvalid}
+                feedback={form.errors[field.name]}
+                onChange={(e) => setSearch(e.target.value)}
+                onClick={() => setShow(!show)}
+                style={{ paddingLeft: "40px" }}
+              />
+              <Form.Control.Feedback
+                type="invalid"
+                style={{ position: "relative" }}
+              >
+                {form.errors[field.name]}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <div className="result">
+              <ul className="data-result" ref={listRef}>
+                {list.map((item, i) => {
+                  return (
+                    <li
+                      key={i}
+                      onClick={() => {
+                        if (item[keyField] !== 0) {
+                          select({
+                            codigo: item[keyField],
+                            nome: item[searchField],
+                          });
+                          form.setFieldValue(name, {
+                            codigo: item[keyField],
+                            nome: item[searchField],
+                          });
+                          setSearch("");
+                        }
+                      }}
+                    >
+                      {item[keyField] + " - " + item[searchField]}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        );
+      }}
+    </Field>
   );
+};
+
+SearchBar.defaultProps = {
+  type: "text",
 };
 
 export default SearchBar;

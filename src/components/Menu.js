@@ -31,22 +31,40 @@ export default function Menu() {
                   Home
                 </Nav.Link>
                 <NavDropdown title="Cadastro" id={`offcanvasNavbarDropdown`}>
-                  {/* <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/alunos">
+                  <NavDropdown.Item
+                    as={Link}
+                    to="/frontend-pfsii/cadastro/alunos"
+                  >
                     Alunos
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/cargos">
+                  <NavDropdown.Item
+                    as={Link}
+                    to="/frontend-pfsii/cadastro/cargos"
+                  >
                     Cargos
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/cursos">
+                  <NavDropdown.Item
+                    as={Link}
+                    to="/frontend-pfsii/cadastro/cursos"
+                  >
                     Cursos
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/empresas">
+                  <NavDropdown.Item
+                    as={Link}
+                    to="/frontend-pfsii/cadastro/empresas"
+                  >
                     Empresas
                   </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/funcionarios">
+                  <NavDropdown.Item
+                    as={Link}
+                    to="/frontend-pfsii/cadastro/funcionarios"
+                  >
                     Funcionarios
-                  </NavDropdown.Item> */}
-                  <NavDropdown.Item as={Link} to="/frontend-pfsii/cadastro/turmas">
+                  </NavDropdown.Item>
+                  <NavDropdown.Item
+                    as={Link}
+                    to="/frontend-pfsii/cadastro/turmas"
+                  >
                     Turmas
                   </NavDropdown.Item>
                 </NavDropdown>

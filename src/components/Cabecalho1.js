@@ -21,8 +21,8 @@ export default function Cabecalho1(props) {
       >
         <Menu />
         <div
-          className="p-0 m-0"
-          style={{ fontWeight: "bold", fontSize: "2vw" }}
+          className="p-0 m-0 text-center"
+          style={{ fontWeight: "bold", fontSize: "2vh" }}
         >
           SGi | GERENCIAMENTO DE SERVIÇOS
         </div>
@@ -36,7 +36,6 @@ export default function Cabecalho1(props) {
               size="sm"
               variant="danger"
               onClick={handleLogout}
-              className="pe-3"
             >
               <RiShutDownLine size={20} className="mx-1" />
               Logout

@@ -1,4 +1,4 @@
-import { Table, Form, Row, Col } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { BotaoNovo } from "../../components/Botoes";
 import Cabecalho2 from "../../components/Cabecalho2";
@@ -26,13 +26,13 @@ export default function TabelaCadastroCargos({
   const handleDelete = async (codigo) => {
     await axios
       .delete(`${urlBase}/cargos/${codigo}`)
-      .then(({ data }) => {
+      .then((response) => {
         const newArray = cargos.filter((cargo) => cargo.codigo !== codigo);
 
         setCargos(newArray);
-        toast.info(data.mensagem);
+        toast.success(response.data.message);
       })
-      .catch(({ response }) => toast.error(response.data.mensagem));
+      .catch(({ response }) => toast.error(response.data.message));
 
     setOnEdit(null);
   };
@@ -63,18 +63,13 @@ export default function TabelaCadastroCargos({
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
           <Form>
-            <Row>
-              <Col>
-                {" "}
-                <Form.Control
-                  type="text"
-                  value={filtro}
-                  placeholder="Pesquisar por nome..."
-                  onChange={(e) => aoMudarFiltro(e.target.value)}
-                  style={{ width: "300px" }}
-                />
-              </Col>
-            </Row>
+            <Form.Control
+              type="text"
+              value={filtro}
+              placeholder="Pesquisar por nome..."
+              onChange={(e) => aoMudarFiltro(e.target.value)}
+              style={{ width: "300px" }}
+            />
           </Form>
         </div>
         <Table hover style={{ fontSize: "14px" }}>
@@ -103,10 +98,10 @@ function LinhaCargo({ cargo, handleEdit, handleConfirm }) {
         <AiOutlineEdit
           size={20}
           onClick={() => handleEdit(cargo)}
-          style={{ cursor: "pointer",  }}
+          style={{ cursor: "pointer" }}
           title="Editar"
         />{" "}
-        <AiOutlineDelete 
+        <AiOutlineDelete
           size={20}
           onClick={() => handleConfirm(cargo.codigo)}
           style={{ cursor: "pointer", color: "red" }}

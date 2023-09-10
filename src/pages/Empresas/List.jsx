@@ -26,15 +26,15 @@ export default function TabelaCadastroEmpresas({
   const handleDelete = async (codigo) => {
     await axios
       .delete(`${urlBase}/empresas/${codigo}`)
-      .then(({ data }) => {
+      .then((response) => {
         const newArray = empresas.filter(
           (empresa) => empresa.codigo !== codigo
         );
 
         setEmpresas(newArray);
-        toast.info(data.mensagem);
+        toast.success(response.data.message);
       })
-      .catch(({ response }) => toast.error(response.data.mensagem));
+      .catch(({ response }) => toast.error(response.data.message));
 
     setOnEdit(null);
   };
@@ -46,7 +46,7 @@ export default function TabelaCadastroEmpresas({
 
   empresas.forEach((empresa, i) => {
     if (
-      empresa.razao_social.toLowerCase().indexOf(filtro.toLowerCase()) === -1
+      empresa.razaoSocial.toLowerCase().indexOf(filtro.toLowerCase()) === -1
     ) {
       return;
     }
@@ -100,7 +100,7 @@ function LinhaEmpresa({ empresa, handleEdit, handleConfirm }) {
   return (
     <tr>
       <td>{empresa.codigo}</td>
-      <td>{empresa.razao_social}</td>
+      <td>{empresa.razaoSocial}</td>
       {/* <td>{empresa.cnpj}</td> */}
       <td>{empresa.ie}</td>
       <td>{empresa.telefone}</td>

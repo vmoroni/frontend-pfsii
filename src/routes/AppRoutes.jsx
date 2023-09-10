@@ -15,6 +15,7 @@ import {
   PageFuncionarios,
   PageTurmas,
   HomePage,
+  Page404
 } from "../pages/Layout/Index";
 
 import LoginPage from "../pages/LoginPage/Index";
@@ -97,6 +98,7 @@ const AppRoutes = () => {
                   </Private>
                 }
               />
+              <Route path="*" element={<Page404 />} />
             </Route>
           </Route>
         </Routes>
