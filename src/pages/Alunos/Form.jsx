@@ -1,7 +1,7 @@
 import { Container, Col, Form, Row, Button } from "react-bootstrap";
 import { useRef, useEffect } from "react";
 import Cabecalho2 from "../../components/Cabecalho2";
-import { urlBase } from "../../utils/definicoes";
+import { urlBase } from "../../utils/definitions";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Formik } from "formik";

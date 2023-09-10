@@ -3,7 +3,7 @@ import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { BotaoNovo } from "../../components/Botoes";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { Container } from "react-bootstrap";
-import { urlBase } from "../../utils/definicoes";
+import { urlBase } from "../../utils/definitions";
 import axios from "axios";
 import { toast } from "react-toastify";
 

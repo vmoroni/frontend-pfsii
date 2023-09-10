@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Form from "./Form";
 import List from "./List";
-import { urlBase } from "../../utils/definicoes";
+import { urlBase } from "../../utils/definitions";
 import axios from "axios";
 import { toast } from "react-toastify";
 

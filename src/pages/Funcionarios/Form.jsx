@@ -1,7 +1,7 @@
 import { Container, Col, Form, Row, Button } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
 import Cabecalho2 from "../../components/Cabecalho2";
-import { urlBase } from "../../utils/definicoes";
+import { urlBase } from "../../utils/definitions";
 import axios from "axios";
 import { toast } from "react-toastify";
 import SearchBar from "../../components/SearchBar/Index";

@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import FormTextField from "../../components/Form/form-field";
 import FormSelectField from "../../components/Form/form-select-field";
 import { emailRegex } from "../../utils/expressions";
-import { urlBase } from "../../utils/definicoes";
+import { urlBase } from "../../utils/definitions";
 import MaskedFormTextField from "../../components/Form/masked-form-field";
 
 const schema = Yup.object().shape({
