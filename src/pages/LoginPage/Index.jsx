@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button, Container, Row, Col, Form } from "react-bootstrap";
-import Logo from "../../img/logo_1.png";
+import Logo from "./img/logo.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useState, useContext } from "react";
