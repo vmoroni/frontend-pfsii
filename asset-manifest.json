@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/frontend-pfsii/static/css/main.1a4f0606.css",
-    "main.js": "/frontend-pfsii/static/js/main.536e4855.js",
+    "main.css": "/frontend-pfsii/static/css/main.0650fd93.css",
+    "main.js": "/frontend-pfsii/static/js/main.8f7b9c71.js",
     "static/media/logo.png": "/frontend-pfsii/static/media/logo.d7e7ecd073955fa86c41.png",
     "static/media/error.jpg": "/frontend-pfsii/static/media/error.11311d4cd8a55eea3610.jpg",
     "static/media/lato-latin-300.woff": "/frontend-pfsii/static/media/lato-latin-300.4d96f9e685a54d1ef6cf.woff",
@@ -25,11 +25,11 @@
     "static/media/lato-latin-300italic.woff2": "/frontend-pfsii/static/media/lato-latin-300italic.dc62e1fd720db6f7d418.woff2",
     "static/media/lato-latin-100italic.woff2": "/frontend-pfsii/static/media/lato-latin-100italic.89b95baaf00652c7c3af.woff2",
     "index.html": "/frontend-pfsii/index.html",
-    "main.1a4f0606.css.map": "/frontend-pfsii/static/css/main.1a4f0606.css.map",
-    "main.536e4855.js.map": "/frontend-pfsii/static/js/main.536e4855.js.map"
+    "main.0650fd93.css.map": "/frontend-pfsii/static/css/main.0650fd93.css.map",
+    "main.8f7b9c71.js.map": "/frontend-pfsii/static/js/main.8f7b9c71.js.map"
   },
   "entrypoints": [
-    "static/css/main.1a4f0606.css",
-    "static/js/main.536e4855.js"
+    "static/css/main.0650fd93.css",
+    "static/js/main.8f7b9c71.js"
   ]
 }
