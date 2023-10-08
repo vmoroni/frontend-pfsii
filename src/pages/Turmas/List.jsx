@@ -43,9 +43,9 @@ export default function TabelaCadastroTurmas({
   };
 
   turmas.forEach((turma, i) => {
-    if (turma.curso.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
-      return;
-    }
+    // if (turma.curso.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
+    //   return;
+    // }
     linhas.push(
       <LinhaTurma
         turma={turma}
@@ -76,10 +76,12 @@ export default function TabelaCadastroTurmas({
           <thead>
             <tr>
               <th>#</th>
-              <th>Período</th>
               <th>Ano Letivo</th>
-              <th>Cursos</th>
-              <th>Professor</th>
+              <th>Período</th>
+              <th>Data Início</th>
+              <th>Data Fim</th>
+              {/* <th>Cursos</th> */}
+              {/* <th>Professor</th> */}
               {/* <th>Início</th>
               <th>Status</th>
               <th>Vagas</th> */}
@@ -97,10 +99,12 @@ function LinhaTurma({ turma, handleEdit, handleConfirm }) {
   return (
     <tr>
       <td>{turma.codigo}</td>
-      <td>{turma.periodo}</td>
       <td>{turma.anoLetivo}</td>
-      <td>{turma.curso.nome}</td>
-      <td>{turma.funcionario.nome}</td>
+      <td>{turma.periodo}</td>
+      <td>{turma.dataInicio}</td>
+      <td>{turma.dataFim}</td>
+      {/* <td>{turma.curso.nome}</td> */}
+      {/* <td>{turma.funcionario.nome}</td> */}
       {/* <td>{turma.dataInicio}</td>
       <td>{turma.status}</td>
       <td>{turma.vagas}</td> */}

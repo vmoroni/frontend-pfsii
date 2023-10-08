@@ -1,95 +1,125 @@
-import { Link } from "react-router-dom";
-import { Button, Container, Row, Col, Form } from "react-bootstrap";
+// import { Link } from "react-router-dom";
+import { Button, Container, Row, Col, Form, Card } from "react-bootstrap";
 import Logo from "./img/logo.png";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useState, useContext } from "react";
+import { useContext, useRef } from "react";
 import { AuthContext } from "../../contexts/auth";
+import * as Yup from "yup";
+import { Formik } from "formik";
+import FormTextField from "../../components/Form/form-field";
+
+const schema = Yup.object().shape({
+  usuario: Yup.string().required("Digite um nome de usuário"),
+  senha: Yup.string().required("Digite uma senha"),
+});
+
+const initialValues = {
+  usuario: "",
+  senha: "",
+};
+
+// const options = {
+//   headers: { "content-type": "application/json" },
+// };
 
 const LoginPage = () => {
+  const formikRef = useRef();
   const { login } = useContext(AuthContext);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    console.log("submit", { email, password });
-    login(email, password); // integração com o contexto / api
+  const handleSubmit = async (values, { validate }) => {
+    login(values.usuario, values.senha); // integração com o contexto / api
   };
 
   return (
     <div>
-      <Container fluid>
-        <Row
-          style={{ height: "100vh" }}
-          className="d-flex justify-content-center"
-        >
-          <Col className="d-flex flex-column p-0" md={4}>
+      <Container>
+        <Row className="vh-100 d-flex justify-content-center align-items-center">
+          <Col md={7} lg={5} xs={12}>
+            {/* <div className="border border-3 border-primary"></div> */}
             <div
-              className="m-2"
               style={{
-                height: "250px",
+                height: "200px",
                 backgroundImage: `url(${Logo})`,
-                backgroundSize: "60% auto",
+                backgroundSize: "100%",
                 backgroundRepeat: "no-repeat",
                 backgroundPositionX: "center",
                 backgroundPositionY: "center",
               }}
             ></div>
+            <Card className="shadow mt-5">
+              <Card.Body>
+                <div className="mb-3 mt-md-3">
+                  {/* <h2 className="fw-bold mb-2 text-uppercase ">Brand</h2> */}
+                  {/* <p className=" mb-4 text-center">
+                    Acesse a sua conta
+                  </p> */}
+                  <div className="mb-3">
+                    <Formik
+                      innerRef={formikRef}
+                      validationSchema={schema}
+                      onSubmit={handleSubmit}
+                      initialValues={initialValues}
+                      validateOnBlur={false}
+                      validateOnChange={false}
+                    >
+                      {({
+                        handleSubmit,
+                        handleChange,
+                        values,
+                        errors,
+                        isValid,
+                        isSubmitting,
+                        dirty,
+                      }) => (
+                        <Form noValidate onSubmit={handleSubmit}>
+                          <Row className="mb-3">
+                            <FormTextField
+                              controlId="formLogin.usuario"
+                              label="Nome de usuário"
+                              name="usuario"
+                              value={values.usuario}
+                            />
+                          </Row>
+                          <Row className="mb-3">
+                            <FormTextField
+                              controlId="formLogin.senha"
+                              label="Senha"
+                              name="senha"
+                              value={values.senha}
+                              type="password"
+                            />
+                          </Row>
+                          <Row>
+                            <p className="small">
+                              <a className="text-primary" href="#!">
+                                Esqueceu a senha?
+                              </a>
+                            </p>
+                          </Row>
 
-            <div className="text-center mb-1">
-              <span>Acesse a sua conta</span>
-            </div>
-
-            <div
-              className="p-4 m-0 text-center rounded-2"
-              style={{ backgroundColor: "#D9D9D9" }}
-            >
-              <Form onSubmit={handleSubmit}>
-                <Form.Group>
-                  <Form.Control
-                    className="mb-3"
-                    type="text"
-                    placeholder="Usuário"
-                    value={email}
-                    onChange={(e) => [setEmail(e.target.value)]}
-                  />
-                </Form.Group>
-                <Form.Group>
-                  <Form.Control
-                    className="mb-3"
-                    type="password"
-                    placeholder="Senha"
-                    value={password}
-                    onChange={(e) => [setPassword(e.target.value)]}
-                  />
-                </Form.Group>
-                <Button
-                  className="mb-3"
-                  style={{ width: "100%" }}
-                  type="submit"
-                >
-                  Entrar
-                </Button>
-              </Form>
-              <Link to={""}>Esqueceu a senha?</Link>
-            </div>
-            <div
-              className="position-absolute bottom-0 start-50 translate-middle fw-light"
-              style={{ fontSize: "12px" }}
-            >
-              Desenvolvido por APACHESYS
-            </div>
+                          <div className="d-grid">
+                            <Button variant="primary" type="submit">
+                              Entrar
+                            </Button>
+                          </div>
+                        </Form>
+                      )}
+                    </Formik>
+                    {/* <div className="mt-3">
+                      <p className="mb-0  text-center">
+                        Don't have an account?{" "}
+                        <a href="{''}" className="text-primary fw-bold">
+                          Sign Up
+                        </a>
+                      </p>
+                    </div> */}
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
           </Col>
         </Row>
       </Container>
-      <ToastContainer
-        autoClose={5000}
-        position={toast.POSITION.BOTTOM_LEFT}
-        theme="colored"
-      />
     </div>
   );
 };

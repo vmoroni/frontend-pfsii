@@ -81,7 +81,7 @@ export default function TabelaCadastroFuncionarios({
               <th>Nome</th>
               <th>CPF</th>
               {/* <th>Usuário</th> */}
-              <th>Cargo</th>
+              {/* <th>Cargo</th> */}
               {/* <th>Telefone</th> */}
               <th>Status</th>
               {/* <th>E-mail</th> */}
@@ -102,9 +102,9 @@ function LinhaFuncionario({ funcionario, handleEdit, handleConfirm }) {
       <td>{funcionario.nome}</td>
       <td>{funcionario.cpf}</td>
       {/* <td>{funcionario.nomeUsuario}</td> */}
-      <td>{funcionario.cargo.nome}</td>
+      {/* <td>{funcionario.cargo.nome}</td> */}
       {/* <td>{funcionario.telefone}</td> */}
-      <td>{funcionario.status}</td>
+      <td>{funcionario.status ? "Ativo" : "Inativo"}</td>
       {/* <td>{funcionario.email}</td> */}
       <td>
         <AiOutlineEdit

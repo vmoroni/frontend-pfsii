@@ -19,6 +19,7 @@ export default function Menu() {
             id={`offcanvasNavbar`}
             aria-labelledby={`offcanvasNavbarLabel`}
             placement="start"
+            style={{ maxWidth: "275px" }}
           >
             <Offcanvas.Header closeButton>
               <Offcanvas.Title id={`offcanvasNavbarLabel`}>
@@ -26,7 +27,7 @@ export default function Menu() {
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <Nav className="justify-content-end flex-grow-1 pe-3">
+              <Nav>
                 <Nav.Link as={Link} to="/frontend-pfsii">
                   Home
                 </Nav.Link>
@@ -75,6 +76,9 @@ export default function Menu() {
                   </NavDropdown.Item>
                   
                 </NavDropdown>
+                <Nav.Link as={Link} to="/frontend-pfsii/inserir-alunos-turmas">
+                  Inscrever alunos
+                </Nav.Link>
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>

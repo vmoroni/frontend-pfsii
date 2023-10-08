@@ -26,7 +26,7 @@ export default function TelaCadastroTurmas(props) {
 
   const getFuncionarios = async () => {
     try {
-      const res = await axios.get(urlBase + "/funcionarios/professor");
+      const res = await axios.get(urlBase + "/funcionarios/professores");
       if (Array.isArray(res.data)) {
         setFuncionarios(res.data);
       }

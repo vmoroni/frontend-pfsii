@@ -7,6 +7,7 @@ import Turmas from "../Turmas/Index";
 import Cabecalho1 from "../../components/Cabecalho1";
 import Home from "../HomePage/Index";
 import Pagina404 from "../404/Index";
+import TelaInserirAlunosTurmas from "../AlunosTurmas/Index";
 
 // PÁGINAS
 
@@ -64,6 +65,15 @@ function PageTurmas(props) {
   );
 }
 
+function PageAlunosTurmas(props) {
+  return (
+    <>
+      <Cabecalho1 />
+      <TelaInserirAlunosTurmas />
+    </>
+  );
+}
+
 // TELAS
 
 function HomePage(props) {
@@ -93,4 +103,5 @@ export {
   HomePage,
   PageTurmas,
   Page404,
+  PageAlunosTurmas,
 };

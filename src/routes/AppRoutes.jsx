@@ -14,8 +14,9 @@ import {
   PageEmpresas,
   PageFuncionarios,
   PageTurmas,
+  PageAlunosTurmas,
   HomePage,
-  Page404
+  Page404,
 } from "../pages/Layout/Index";
 
 import LoginPage from "../pages/LoginPage/Index";
@@ -46,6 +47,14 @@ const AppRoutes = () => {
               element={
                 <Private>
                   <HomePage />
+                </Private>
+              }
+            />
+            <Route
+              path="/frontend-pfsii/inserir-alunos-turmas"
+              element={
+                <Private>
+                  <PageAlunosTurmas />
                 </Private>
               }
             />
