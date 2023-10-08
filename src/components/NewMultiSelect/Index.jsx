@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import { BiSearch } from "react-icons/bi";
 
-import "../MultiSelect/searchbar.css";
+import "./searchbar.css";
 import { AiOutlineClose, AiOutlineUsergroupAdd } from "react-icons/ai";
 
 function useOutsideAlerter(ref, inputRef, setShow, setSearch) {
