@@ -60,7 +60,7 @@ export default function TabelaCadastroFuncionarios({
 
   return (
     <div>
-      <Cabecalho2 texto1={"Consulta"} texto2={"Funcionarios"} />
+      <Cabecalho2 texto1={"Consulta"} texto2={"Funcionários"} />
       <Container className="mt-3 overflow-auto">
         <div className="d-flex mb-3 justify-content-between">
           <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />

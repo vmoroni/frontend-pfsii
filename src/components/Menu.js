@@ -47,12 +47,12 @@ export default function Menu() {
                     Cargos
                   </NavDropdown.Item> */}
 
-                  <NavDropdown.Item
+                  {/* <NavDropdown.Item
                     as={Link}
                     to="/frontend-pfsii/cadastro/cursos"
                   >
                     Cursos
-                  </NavDropdown.Item>
+                  </NavDropdown.Item> */}
 
                   {/* <NavDropdown.Item
                     as={Link}
@@ -65,7 +65,7 @@ export default function Menu() {
                     as={Link}
                     to="/frontend-pfsii/cadastro/funcionarios"
                   >
-                    Funcionarios
+                    Funcionários
                   </NavDropdown.Item>
 
                   <NavDropdown.Item
