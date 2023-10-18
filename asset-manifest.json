@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/frontend-pfsii/static/css/main.e6117c5a.css",
-    "main.js": "/frontend-pfsii/static/js/main.e55e5eff.js",
+    "main.js": "/frontend-pfsii/static/js/main.f2dba88f.js",
     "static/media/fontawesome-webfont.svg?v=4.7.0": "/frontend-pfsii/static/media/fontawesome-webfont.c1e38fd9e0e74ba58f7a.svg",
     "static/media/fontawesome-webfont.eot": "/frontend-pfsii/static/media/fontawesome-webfont.8b43027f47b20503057d.eot",
     "static/media/fontawesome-webfont.ttf?v=4.7.0": "/frontend-pfsii/static/media/fontawesome-webfont.1e59d2330b4c6deb84b3.ttf",
@@ -31,10 +31,10 @@
     "static/media/lato-latin-100italic.woff2": "/frontend-pfsii/static/media/lato-latin-100italic.89b95baaf00652c7c3af.woff2",
     "index.html": "/frontend-pfsii/index.html",
     "main.e6117c5a.css.map": "/frontend-pfsii/static/css/main.e6117c5a.css.map",
-    "main.e55e5eff.js.map": "/frontend-pfsii/static/js/main.e55e5eff.js.map"
+    "main.f2dba88f.js.map": "/frontend-pfsii/static/js/main.f2dba88f.js.map"
   },
   "entrypoints": [
     "static/css/main.e6117c5a.css",
-    "static/js/main.e55e5eff.js"
+    "static/js/main.f2dba88f.js"
   ]
 }
