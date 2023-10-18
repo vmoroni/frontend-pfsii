@@ -17,6 +17,7 @@ import {
   PageAlunosTurmas,
   HomePage,
   Page404,
+  PageOrientadores,
 } from "../pages/Layout/Index";
 
 import LoginPage from "../pages/LoginPage/Index";
@@ -96,6 +97,14 @@ const AppRoutes = () => {
                 element={
                   <Private>
                     <PageFuncionarios />
+                  </Private>
+                }
+              />
+              <Route
+                path="/frontend-pfsii/cadastro/orientadores"
+                element={
+                  <Private>
+                    <PageOrientadores />
                   </Private>
                 }
               />

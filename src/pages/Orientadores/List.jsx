@@ -10,9 +10,9 @@ import { urlBase } from "../../utils/definitions";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function TabelaCadastroFuncionarios({
-  funcionarios,
-  setFuncionarios,
+export default function TabelaCadastroOrientadores({
+  orientadores,
+  setOrientadores,
   filtro,
   aoMudarFiltro,
   setOnEdit,
@@ -28,13 +28,13 @@ export default function TabelaCadastroFuncionarios({
 
   const handleDelete = async (codigo) => {
     await axios
-      .delete(`${urlBase}/funcionarios/${codigo}`)
+      .delete(`${urlBase}/orientadores/${codigo}`)
       .then((response) => {
-        const newArray = funcionarios.filter(
-          (funcionario) => funcionario.codigo !== codigo
+        const newArray = orientadores.filter(
+          (orientador) => orientador.codigo !== codigo
         );
 
-        setFuncionarios(newArray);
+        setOrientadores(newArray);
         toast.success(response.data.message);
       })
       .catch(({ response }) => toast.error(response.data.message));
@@ -47,13 +47,13 @@ export default function TabelaCadastroFuncionarios({
     setExibeTabela(false);
   };
 
-  funcionarios.forEach((funcionario, i) => {
-    if (funcionario.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
+  orientadores.forEach((orientador, i) => {
+    if (orientador.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
       return;
     }
     linhas.push(
-      <LinhaFuncionario
-        funcionario={funcionario}
+      <LinhaOrientador
+        orientador={orientador}
         key={i}
         handleEdit={handleEdit}
         handleConfirm={confirmOnDelete}
@@ -63,7 +63,7 @@ export default function TabelaCadastroFuncionarios({
 
   return (
     <div>
-      <Cabecalho2 texto1={"Consulta"} texto2={"Funcionários"} />
+      <Cabecalho2 texto1={"Consulta"} texto2={"Orientadores"} />
       <Container className="mt-3">
         <Row className="justify-content-between">
           <Col xs={12} md={6} lg={8} className="mb-3">
@@ -91,12 +91,9 @@ export default function TabelaCadastroFuncionarios({
             <tr>
               <th className="text-center">#</th>
               <th>Nome</th>
-              <th>CPF</th>
-              {/* <th>Usuário</th> */}
-              {/* <th>Cargo</th> */}
-              {/* <th>Telefone</th> */}
+              <th>Usuário</th>
+              <th>Empresa</th>
               <th>Status</th>
-              {/* <th>E-mail</th> */}
               <th className="text-center">Ações</th>
             </tr>
           </thead>
@@ -107,21 +104,20 @@ export default function TabelaCadastroFuncionarios({
   );
 }
 
-function LinhaFuncionario({ funcionario, handleEdit, handleConfirm }) {
+function LinhaOrientador({ orientador, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td className="text-center">{funcionario.codigo}</td>
-      <td>{funcionario.nome}</td>
-      <td>{funcionario.cpf}</td>
-      {/* <td>{funcionario.nomeUsuario}</td> */}
-      {/* <td>{funcionario.cargo.nome}</td> */}
+      <td className="text-center">{orientador.codigo}</td>
+      <td>{orientador.nome}</td>
+      <td>{orientador.nomeUsuario}</td>
+      <td>{orientador.empresa.nome}</td>
       {/* <td>{funcionario.telefone}</td> */}
-      <td>{funcionario.status ? "Ativo" : "Inativo"}</td>
+      <td>{orientador.status ? "Ativo" : "Inativo"}</td>
       {/* <td>{funcionario.email}</td> */}
       <td>
         <div className="d-flex justify-content-center">
-          <EditButton onclick={() => handleEdit(funcionario)} />
-          <DeleteButton onclick={() => handleConfirm(funcionario.codigo)} />
+          <EditButton onclick={() => handleEdit(orientador)} />
+          <DeleteButton onclick={() => handleConfirm(orientador.codigo)} />
         </div>
       </td>
     </tr>

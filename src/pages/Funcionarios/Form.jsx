@@ -111,7 +111,6 @@ export default function FormFuncionario({
 
   useEffect(() => {
     if (onEdit) {
-      console.log(onEdit);
       for (const key in onEdit) {
         if (key === "info") {
           for (const key2 in onEdit["info"]) {

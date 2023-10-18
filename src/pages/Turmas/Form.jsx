@@ -59,8 +59,6 @@ export default function FormTurma({
   const handleSubmit = async (values, actions) => {
     const updatedTurmas = turmas;
 
-    console.log(JSON.stringify(values, null, 2));
-
     if (onEdit) {
       axios
         .put(`${urlBase}/turmas/`, JSON.stringify(values), options)

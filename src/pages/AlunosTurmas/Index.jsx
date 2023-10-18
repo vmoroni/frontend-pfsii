@@ -88,14 +88,14 @@ export default function TelaInserirAlunosTurmas() {
     }
     linhas.push(
       <tr key={aluno.codigo} onClick={() => toggleSelectAluno(aluno.codigo)}>
-        <td>
+        <td className="text-center">
           <Form.Check
             type="checkbox"
             checked={selectedAlunos.includes(aluno.codigo)}
             onChange={() => toggleSelectAluno(aluno.codigo)}
           />
         </td>
-        <td>{aluno.codigo}</td>
+        <td className="text-center">{aluno.codigo}</td>
         <td>{aluno.nome}</td>
         <td>{aluno.cpf}</td>
         <td>{aluno.rg}</td>
@@ -172,17 +172,18 @@ export default function TelaInserirAlunosTurmas() {
             </Form>
           </Col>
         </Row>
-        <Table hover responsive="sm">
+        <Table bordered hover responsive="sm">
           <thead>
             <tr>
-              <th>
+              <th className="text-center">
                 <Form.Check
                   type="checkbox"
                   checked={selectAll}
                   onChange={toggleSelectAll}
+                  title="Selecionar todos"
                 />
               </th>
-              <th>#</th>
+              <th className="text-center">#</th>
               <th>Nome</th>
               <th>CPF</th>
               <th>RG</th>

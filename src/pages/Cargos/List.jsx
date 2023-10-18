@@ -1,6 +1,9 @@
 import { Table, Form } from "react-bootstrap";
-import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
-import { BotaoNovo } from "../../components/Botoes";
+import {
+  AddButton,
+  DeleteButton,
+  EditButton,
+} from "../../components/Buttons/Index";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { Container } from "react-bootstrap";
 import { urlBase } from "../../utils/definitions";
@@ -59,9 +62,9 @@ export default function TabelaCadastroCargos({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Cargos"} />
-      <Container className="mt-3 overflow-auto">
+      <Container className="mt-3">
         <div className="d-flex mb-3 justify-content-between">
-          <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
+          <AddButton onclick={() => setExibeTabela(false)} />
           <Form>
             <Form.Control
               type="text"
@@ -72,13 +75,13 @@ export default function TabelaCadastroCargos({
             />
           </Form>
         </div>
-        <Table hover style={{ fontSize: "14px" }}>
+        <Table bordered hover className="fs-6">
           <thead>
             <tr>
-              <th>#</th>
+              <th className="text-center">#</th>
               <th>Nome</th>
               <th>Descrição</th>
-              <th>Ações</th>
+              <th className="text-center">Ações</th>
             </tr>
           </thead>
           <tbody>{linhas}</tbody>
@@ -91,22 +94,14 @@ export default function TabelaCadastroCargos({
 function LinhaCargo({ cargo, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td>{cargo.codigo}</td>
+      <td className="text-center">{cargo.codigo}</td>
       <td>{cargo.nome}</td>
       <td>{cargo.descricao}</td>
       <td>
-        <AiOutlineEdit
-          size={20}
-          onClick={() => handleEdit(cargo)}
-          style={{ cursor: "pointer" }}
-          title="Editar"
-        />{" "}
-        <AiOutlineDelete
-          size={20}
-          onClick={() => handleConfirm(cargo.codigo)}
-          style={{ cursor: "pointer", color: "red" }}
-          title="Excluir"
-        />
+        <div className="d-flex justify-content-center">
+          <EditButton onclick={() => handleEdit(cargo)} />
+          <DeleteButton onclick={() => handleConfirm(cargo.codigo)} />
+        </div>
       </td>
     </tr>
   );

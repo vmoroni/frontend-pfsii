@@ -1,6 +1,9 @@
-import { Table, Form } from "react-bootstrap";
-import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
-import { BotaoNovo } from "../../components/Botoes";
+import { Table, Form, Row, Col, InputGroup, Button } from "react-bootstrap";
+import {
+  AddButton,
+  DeleteButton,
+  EditButton,
+} from "../../components/Buttons/Index";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { Container } from "react-bootstrap";
 import { urlBase } from "../../utils/definitions";
@@ -59,23 +62,32 @@ export default function TabelaCadastroTurmas({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Turmas"} />
-      <Container className="mt-3 overflow-auto">
-        <div className="d-flex mb-3 justify-content-between">
-          <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
-          <Form>
-            <Form.Control
-              type="text"
-              value={filtro}
-              placeholder="Curso..."
-              onChange={(e) => aoMudarFiltro(e.target.value)}
-              style={{ width: "300px" }}
-            />
-          </Form>
-        </div>
-        <Table hover style={{ fontSize: "14px" }}>
+      <Container className="mt-3">
+        <Row className="justify-content-between">
+          <Col xs={12} md={6} lg={8} className="mb-3">
+            <AddButton onclick={() => setExibeTabela(false)} />
+          </Col>
+          <Col xs={12} md={6} lg={4} className="mb-3">
+            <InputGroup>
+              <Form.Control
+                type="text"
+                value={filtro}
+                placeholder="Pesquisar por nome..."
+                onChange={(e) => aoMudarFiltro(e.target.value)}
+              />
+              <Button
+                variant="outline-secondary"
+                onClick={() => aoMudarFiltro("")}
+              >
+                Limpar
+              </Button>
+            </InputGroup>
+          </Col>
+        </Row>
+        <Table bordered hover className="fs-6">
           <thead>
             <tr>
-              <th>#</th>
+              <th className="text-center">#</th>
               <th>Ano Letivo</th>
               <th>Período</th>
               <th>Data Início</th>
@@ -85,7 +97,7 @@ export default function TabelaCadastroTurmas({
               {/* <th>Início</th>
               <th>Status</th>
               <th>Vagas</th> */}
-              <th>Ações</th>
+              <th className="text-center">Ações</th>
             </tr>
           </thead>
           <tbody>{linhas}</tbody>
@@ -98,7 +110,7 @@ export default function TabelaCadastroTurmas({
 function LinhaTurma({ turma, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td>{turma.codigo}</td>
+      <td className="text-center">{turma.codigo}</td>
       <td>{turma.anoLetivo}</td>
       <td>{turma.periodo}</td>
       <td>{turma.dataInicio}</td>
@@ -109,18 +121,10 @@ function LinhaTurma({ turma, handleEdit, handleConfirm }) {
       <td>{turma.status}</td>
       <td>{turma.vagas}</td> */}
       <td>
-        <AiOutlineEdit
-          size={20}
-          onClick={() => handleEdit(turma)}
-          style={{ cursor: "pointer" }}
-          title="Editar"
-        />{" "}
-        <AiOutlineDelete
-          size={20}
-          onClick={() => handleConfirm(turma.codigo)}
-          style={{ cursor: "pointer", color: "red" }}
-          title="Excluir"
-        />
+        <div className="d-flex justify-content-center">
+          <EditButton onclick={() => handleEdit(turma)} />
+          <DeleteButton onclick={() => handleConfirm(turma.codigo)} />
+        </div>
       </td>
     </tr>
   );

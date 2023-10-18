@@ -1,6 +1,9 @@
-import { Table, Form } from "react-bootstrap";
-import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
-import { BotaoNovo } from "../../components/Botoes";
+import { Table, Form, Row, Col, InputGroup, Button } from "react-bootstrap";
+import {
+  AddButton,
+  EditButton,
+  DeleteButton,
+} from "../../components/Buttons/Index";
 import Cabecalho2 from "../../components/Cabecalho2";
 import { Container } from "react-bootstrap";
 import { urlBase } from "../../utils/definitions";
@@ -32,9 +35,7 @@ export default function TabelaCadastroAlunos({
         setAlunos(newArray);
         toast.success(response.data.message);
       })
-      .catch(({ response }) =>
-        toast.error(response.data.message)
-      );
+      .catch(({ response }) => toast.error(response.data.message));
 
     setOnEdit(null);
   };
@@ -61,23 +62,32 @@ export default function TabelaCadastroAlunos({
   return (
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Alunos"} />
-      <Container className="mt-3 overflow-auto">
-        <div className="d-flex mb-3 justify-content-between">
-          <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
-          <Form>
-            <Form.Control
-              type="text"
-              value={filtro}
-              placeholder="Pesquisar por nome..."
-              onChange={(e) => aoMudarFiltro(e.target.value)}
-              style={{ width: "300px" }}
-            />
-          </Form>
-        </div>
-        <Table hover style={{ fontSize: "14px" }}>
+      <Container className="mt-3">
+        <Row className="justify-content-between">
+          <Col xs={12} md={6} lg={8} className="mb-3">
+            <AddButton onclick={() => setExibeTabela(false)} />
+          </Col>
+          <Col xs={12} md={6} lg={4} className="mb-3">
+            <InputGroup>
+              <Form.Control
+                type="text"
+                value={filtro}
+                placeholder="Pesquisar por nome..."
+                onChange={(e) => aoMudarFiltro(e.target.value)}
+              />
+              <Button
+                variant="outline-secondary"
+                onClick={() => aoMudarFiltro("")}
+              >
+                Limpar
+              </Button>
+            </InputGroup>
+          </Col>
+        </Row>
+        <Table bordered hover className="fs-6">
           <thead>
             <tr>
-              <th>#</th>
+              <th className="text-center">#</th>
               <th>Nome</th>
               <th>CPF</th>
               {/* <th>RG</th> */}
@@ -85,7 +95,7 @@ export default function TabelaCadastroAlunos({
               {/* <th>Escola</th> */}
               <th>Serie</th>
               <th>Periodo</th>
-              <th>Ações</th>
+              <th className="text-center">Ações</th>
             </tr>
           </thead>
           <tbody>{linhas}</tbody>
@@ -98,7 +108,7 @@ export default function TabelaCadastroAlunos({
 function LinhaAluno({ aluno, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td>{aluno.codigo}</td>
+      <td className="text-center">{aluno.codigo}</td>
       <td>{aluno.nome}</td>
       <td>{aluno.cpf}</td>
       {/* <td>{aluno.rg}</td> */}
@@ -107,18 +117,10 @@ function LinhaAluno({ aluno, handleEdit, handleConfirm }) {
       <td>{aluno.serie}</td>
       <td>{aluno.periodo}</td>
       <td>
-        <AiOutlineEdit
-          size={20}
-          onClick={() => handleEdit(aluno)}
-          style={{ cursor: "pointer" }}
-          title="Editar"
-        />{" "}
-        <AiOutlineDelete
-          size={20}
-          onClick={() => handleConfirm(aluno.codigo)}
-          style={{ cursor: "pointer", color: "red" }}
-          title="Excluir"
-        />
+        <div className="d-flex justify-content-center">
+          <EditButton onclick={() => handleEdit(aluno)} />
+          <DeleteButton onclick={() => handleConfirm(aluno.codigo)} />
+        </div>
       </td>
     </tr>
   );

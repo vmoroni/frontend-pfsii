@@ -2,33 +2,34 @@ import { Field, FieldArray } from "formik";
 import { useEffect, useRef, useState } from "react";
 import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import { BiSearch } from "react-icons/bi";
+import useOutsideAlerter from "../useOutsideAlerter";
 
-import "./searchbar.css";
+import "./multiselect.css";
 import { AiOutlineClose, AiOutlineUsergroupAdd } from "react-icons/ai";
 
-function useOutsideAlerter(ref, inputRef, setShow, setSearch) {
-  useEffect(() => {
-    /**
-     * Alert if clicked on outside of element
-     */
-    function handleClickOutside(event) {
-      if (
-        ref.current &&
-        !ref.current.contains(event.target) &&
-        !inputRef.current.contains(event.target)
-      ) {
-        setShow(false);
-        setSearch("");
-      }
-    }
-    // Bind the event listener
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      // Unbind the event listener on clean up
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [ref, inputRef, setShow, setSearch]);
-}
+// function useOutsideAlerter(ref, inputRef, setShow, setSearch) {
+//   useEffect(() => {
+//     /**
+//      * Alert if clicked on outside of element
+//      */
+//     function handleClickOutside(event) {
+//       if (
+//         ref.current &&
+//         !ref.current.contains(event.target) &&
+//         !inputRef.current.contains(event.target)
+//       ) {
+//         setShow(false);
+//         setSearch("");
+//       }
+//     }
+//     // Bind the event listener
+//     document.addEventListener("click", handleClickOutside);
+//     return () => {
+//       // Unbind the event listener on clean up
+//       document.removeEventListener("click", handleClickOutside);
+//     };
+//   }, [ref, inputRef, setShow, setSearch]);
+// }
 
 const NewMultiSelect = ({
   name,

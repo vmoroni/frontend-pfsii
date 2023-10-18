@@ -1,8 +1,11 @@
 import { Table, Form } from "react-bootstrap";
-import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
-import { BotaoNovo } from "../../components/Botoes";
+import {
+  AddButton,
+  DeleteButton,
+  EditButton,
+} from "../../components/Buttons/Index";
 import Cabecalho2 from "../../components/Cabecalho2";
-import { Container } from "react-bootstrap";
+import { Container, Row, Col, InputGroup, Button } from "react-bootstrap";
 import { urlBase } from "../../utils/definitions";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -45,9 +48,7 @@ export default function TabelaCadastroEmpresas({
   };
 
   empresas.forEach((empresa, i) => {
-    if (
-      empresa.razaoSocial.toLowerCase().indexOf(filtro.toLowerCase()) === -1
-    ) {
+    if (empresa.nome.toLowerCase().indexOf(filtro.toLowerCase()) === -1) {
       return;
     }
     linhas.push(
@@ -64,29 +65,35 @@ export default function TabelaCadastroEmpresas({
     <div>
       <Cabecalho2 texto1={"Consulta"} texto2={"Empresas"} />
       <Container className="mt-3 overflow-auto">
-        <div className="d-flex mb-3 justify-content-between">
-          <BotaoNovo acaoBtnNovo={() => setExibeTabela(false)} />
-          <Form>
-            <Form.Control
-              type="text"
-              value={filtro}
-              placeholder="Pesquisar por razão social..."
-              onChange={(e) => aoMudarFiltro(e.target.value)}
-              style={{ width: "300px" }}
-            />
-          </Form>
-        </div>
-        <Table hover style={{ fontSize: "14px" }}>
+        <Row className="justify-content-between">
+          <Col xs={12} md={6} lg={8} className="mb-3">
+            <AddButton onclick={() => setExibeTabela(false)} />
+          </Col>
+          <Col xs={12} md={6} lg={4} className="mb-3">
+            <InputGroup>
+              <Form.Control
+                type="text"
+                value={filtro}
+                placeholder="Pesquisar por nome..."
+                onChange={(e) => aoMudarFiltro(e.target.value)}
+              />
+              <Button
+                variant="outline-secondary"
+                onClick={() => aoMudarFiltro("")}
+              >
+                Limpar
+              </Button>
+            </InputGroup>
+          </Col>
+        </Row>
+        <Table bordered hover className="fs-6">
           <thead>
             <tr>
-              <th>#</th>
+              <th className="text-center">#</th>
               <th>Razão Social</th>
-              {/* <th>CNPJ</th> */}
-              <th>IE</th>
               <th>Telefone</th>
-              {/* <th>E-mail</th> */}
-              <th>Proprietário</th>
-              <th>Ações</th>
+              <th>E-mail</th>
+              <th className="text-center">Ações</th>
             </tr>
           </thead>
           <tbody>{linhas}</tbody>
@@ -99,26 +106,15 @@ export default function TabelaCadastroEmpresas({
 function LinhaEmpresa({ empresa, handleEdit, handleConfirm }) {
   return (
     <tr>
-      <td>{empresa.codigo}</td>
-      <td>{empresa.razaoSocial}</td>
-      {/* <td>{empresa.cnpj}</td> */}
-      <td>{empresa.ie}</td>
-      <td>{empresa.telefone}</td>
-      {/* <td>{empresa.email}</td> */}
-      <td>{empresa.proprietario}</td>
+      <td className="text-center">{empresa.codigo}</td>
+      <td>{empresa.nome}</td>
+      <td>{empresa.info.telefone}</td>
+      <td>{empresa.info.email}</td>
       <td>
-        <AiOutlineEdit
-          size={20}
-          onClick={() => handleEdit(empresa)}
-          style={{ cursor: "pointer" }}
-          title="Editar"
-        />{" "}
-        <AiOutlineDelete
-          size={20}
-          onClick={() => handleConfirm(empresa.codigo)}
-          style={{ cursor: "pointer", color: "red" }}
-          title="Excluir"
-        />
+        <div className="d-flex justify-content-center">
+          <EditButton onclick={() => handleEdit(empresa)} />
+          <DeleteButton onclick={() => handleConfirm(empresa.codigo)} />
+        </div>
       </td>
     </tr>
   );

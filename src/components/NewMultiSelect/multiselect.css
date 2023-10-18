@@ -14,8 +14,8 @@
   border: 1px solid;
 } */
 
-.search {
-  border: 1px solid #ced4da;
+.multi-select .search {
+  border: 1px solid #b3b8bd;
   position: absolute;
   top: 70px;
   background-color: white;

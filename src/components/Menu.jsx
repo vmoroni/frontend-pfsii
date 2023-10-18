@@ -54,18 +54,25 @@ export default function Menu() {
                     Cursos
                   </NavDropdown.Item> */}
 
-                  {/* <NavDropdown.Item
+                  <NavDropdown.Item
                     as={Link}
                     to="/frontend-pfsii/cadastro/empresas"
                   >
                     Empresas
-                  </NavDropdown.Item> */}
+                  </NavDropdown.Item>
 
                   <NavDropdown.Item
                     as={Link}
                     to="/frontend-pfsii/cadastro/funcionarios"
                   >
                     Funcionários
+                  </NavDropdown.Item>
+
+                  <NavDropdown.Item
+                    as={Link}
+                    to="/frontend-pfsii/cadastro/orientadores"
+                  >
+                    Orientadores
                   </NavDropdown.Item>
 
                   <NavDropdown.Item

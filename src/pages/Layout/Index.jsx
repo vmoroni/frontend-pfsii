@@ -4,8 +4,9 @@ import Cargos from "../Cargos/Index";
 import Funcionarios from "../Funcionarios/Index";
 import Alunos from "../Alunos/Index";
 import Turmas from "../Turmas/Index";
-import Cabecalho1 from "../../components/Cabecalho1";
+import Header from "../../components/Header";
 import Home from "../HomePage/Index";
+import Orientadores from "../Orientadores/Index";
 import Pagina404 from "../404/Index";
 import TelaInserirAlunosTurmas from "../AlunosTurmas/Index";
 
@@ -14,7 +15,7 @@ import TelaInserirAlunosTurmas from "../AlunosTurmas/Index";
 function PageAlunos(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <Alunos />
     </>
   );
@@ -23,7 +24,7 @@ function PageAlunos(props) {
 function PageCargos(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <Cargos />
     </>
   );
@@ -32,7 +33,7 @@ function PageCargos(props) {
 function PageCursos(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <Cursos />
     </>
   );
@@ -41,7 +42,7 @@ function PageCursos(props) {
 function PageEmpresas(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <Empresas />
     </>
   );
@@ -50,8 +51,17 @@ function PageEmpresas(props) {
 function PageFuncionarios(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <Funcionarios />
+    </>
+  );
+}
+
+function PageOrientadores(props) {
+  return (
+    <>
+      <Header />
+      <Orientadores />
     </>
   );
 }
@@ -59,7 +69,7 @@ function PageFuncionarios(props) {
 function PageTurmas(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <Turmas />
     </>
   );
@@ -68,7 +78,7 @@ function PageTurmas(props) {
 function PageAlunosTurmas(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <TelaInserirAlunosTurmas />
     </>
   );
@@ -79,7 +89,7 @@ function PageAlunosTurmas(props) {
 function HomePage(props) {
   return (
     <>
-      <Cabecalho1 />
+      <Header />
       <Home />
     </>
   );
@@ -88,7 +98,7 @@ function HomePage(props) {
 function Page404(props) {
   return (
     <>
-      {/* < Cabecalho1 /> */}
+      {/* < Header /> */}
       <Pagina404 />
     </>
   );
@@ -100,6 +110,7 @@ export {
   PageCursos,
   PageEmpresas,
   PageFuncionarios,
+  PageOrientadores,
   HomePage,
   PageTurmas,
   Page404,
