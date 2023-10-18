@@ -37,7 +37,7 @@ export default function TelaCadastroOrientadores(props) {
   useEffect(() => {
     getOrientadores();
     getEmpresas();
-  }, [orientadores]);
+  }, [setOrientadores]);
 
   return exibeTabela ? (
     <List
